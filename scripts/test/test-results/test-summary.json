@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-10-05T03:15:42.758Z",
+  "environment": {
+    "nodeVersion": "v18.19.1",
+    "platform": "linux",
+    "ci": false,
+    "baseUrl": "http://localhost:3000",
+    "apiBaseUrl": "http://localhost:5000"
+  },
+  "cleanup": {
+    "authStatesCleared": true,
+    "tempFilesCleared": true,
+    "testDataCleared": true
+  }
+}
