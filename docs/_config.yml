@@ -1,0 +1,121 @@
+# GitHub Pages Jekyll 配置
+title: Data-Fabric 项目文档
+description: 基于现代技术栈的知识图谱应用文档
+baseurl: "/Data-Fabric"
+url: "https://aime4eve.github.io"
+
+# 主题设置
+theme: minima
+remote_theme: pages-themes/cayman@v0.2.0
+
+# 插件
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-relative-links
+
+# Markdown 处理器
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
+
+# 高亮设置
+highlighter: rouge
+
+# 文件包含/排除
+include:
+  - _pages
+  - docs
+  - README.md
+
+exclude:
+  - node_modules
+  - src
+  - scripts
+  - tests
+  - .github
+  - docker-compose.yml
+  - Dockerfile
+  - requirements.txt
+  - package.json
+  - package-lock.json
+  - .gitignore
+  - .env*
+  - venv
+  - __pycache__
+
+# 导航菜单
+header_pages:
+  - docs/installation.md
+  - docs/quick-start.md
+  - docs/api.md
+  - docs/deployment.md
+
+# 社交链接
+github_username: aime4eve
+repository: Data-Fabric
+
+# SEO 设置
+author:
+  name: Data-Fabric Team
+  email: support@data-fabric.example.com
+
+social:
+  name: Data-Fabric
+  links:
+    - https://github.com/aime4eve/Data-Fabric
+
+# Google Analytics (可选)
+# google_analytics: UA-XXXXXXXX-X
+
+# 评论系统 (可选)
+# disqus:
+#   shortname: data-fabric
+
+# 搜索功能
+search_enabled: true
+
+# 页脚信息
+footer_content: "Copyright &copy; 2024 Data-Fabric Team. 基于 MIT 许可证分发。"
+
+# 自定义变量
+project:
+  name: Data-Fabric
+  version: "1.0.0"
+  github_url: https://github.com/aime4eve/Data-Fabric
+  demo_url: https://demo.data-fabric.example.com
+  api_url: https://api.data-fabric.example.com
+
+# 构建设置
+safe: true
+incremental: false
+profile: false
+
+# 时区
+timezone: Asia/Shanghai
+
+# 分页设置
+paginate: 10
+paginate_path: "/page:num/"
+
+# 默认值
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: "docs"
+      type: "pages"
+    values:
+      layout: "page"
+      nav_order: 1
