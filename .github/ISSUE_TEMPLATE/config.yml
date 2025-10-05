@@ -1,0 +1,21 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 社区讨论
+    url: https://github.com/aime4eve/Data-Fabric/discussions
+    about: 与社区成员讨论想法、分享经验或寻求帮助
+  
+  - name: 📚 项目文档
+    url: https://aime4eve.github.io/Data-Fabric/
+    about: 查看完整的项目文档、API 参考和使用指南
+  
+  - name: ❓ 常见问题
+    url: https://github.com/aime4eve/Data-Fabric/wiki/FAQ
+    about: 查看常见问题的解答，可能已经有您需要的答案
+  
+  - name: 🚀 功能路线图
+    url: https://github.com/aime4eve/Data-Fabric/projects
+    about: 查看项目的发展规划和即将推出的功能
+  
+  - name: 📧 技术支持
+    url: mailto:support@data-fabric.example.com
+    about: 对于紧急问题或商业支持，请直接联系我们的技术支持团队

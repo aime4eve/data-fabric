@@ -1,0 +1,183 @@
+name: ❓ 问题咨询
+description: 询问使用问题或寻求帮助
+title: "[Question]: "
+labels: ["question", "help-wanted"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        欢迎提问！我们很乐意帮助您解决使用中遇到的问题。
+        
+        💡 **提示**: 在提问之前，建议您先查看：
+        - [📚 项目文档](https://aime4eve.github.io/Data-Fabric/)
+        - [❓ 常见问题](https://github.com/aime4eve/Data-Fabric/wiki/FAQ)
+        - [💬 讨论区](https://github.com/aime4eve/Data-Fabric/discussions)
+
+  - type: textarea
+    id: question
+    attributes:
+      label: ❓ 您的问题
+      description: 请详细描述您的问题
+      placeholder: 请描述您遇到的问题或需要帮助的地方...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: question-type
+    attributes:
+      label: 🏷️ 问题类型
+      description: 您的问题属于哪个类别？
+      options:
+        - 🚀 安装和部署
+        - ⚙️ 配置和设置
+        - 💻 使用方法
+        - 🔌 API 使用
+        - 🎨 前端开发
+        - 🔧 后端开发
+        - 🗄️ 数据库相关
+        - 📊 数据分析
+        - 🔍 查询语法
+        - 🎯 最佳实践
+        - 🚀 性能优化
+        - 🔐 安全相关
+        - 🐛 故障排查
+        - 📚 文档相关
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 📋 背景信息
+      description: 请提供相关的背景信息，帮助我们更好地理解您的问题
+      placeholder: |
+        - 您想要实现什么功能？
+        - 您当前的使用场景是什么？
+        - 您已经尝试了什么方法？
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: 📸 当前情况
+      description: 请描述当前发生的情况
+      placeholder: 描述您当前遇到的情况...
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 🎯 期望结果
+      description: 请描述您期望的结果或行为
+      placeholder: 描述您期望发生的情况...
+
+  - type: textarea
+    id: code-example
+    attributes:
+      label: 💻 代码示例
+      description: 如果相关，请提供您的代码示例
+      render: javascript
+      placeholder: |
+        // 请粘贴您的代码
+        // 或者描述您正在尝试实现的功能
+
+  - type: textarea
+    id: error-message
+    attributes:
+      label: ⚠️ 错误信息
+      description: 如果有错误信息，请粘贴完整的错误日志
+      render: shell
+      placeholder: 粘贴错误信息...
+
+  - type: input
+    id: version
+    attributes:
+      label: 📦 版本信息
+      description: 您使用的项目版本
+      placeholder: "例如: v1.0.0, main 分支"
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 🔧 环境信息
+      description: 请提供您的环境信息
+      placeholder: |
+        - 操作系统:
+        - Node.js 版本:
+        - Python 版本:
+        - 浏览器版本:
+        - 其他相关信息:
+
+  - type: textarea
+    id: attempts
+    attributes:
+      label: 🔍 已尝试的方法
+      description: 请描述您已经尝试过的解决方法
+      placeholder: |
+        - 我已经尝试了...
+        - 我查看了...
+        - 我搜索了...
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 📝 补充信息
+      description: 任何其他可能有用的信息
+      placeholder: 任何其他相关信息...
+
+  - type: checkboxes
+    id: research
+    attributes:
+      label: 🔍 研究确认
+      description: 请确认您已经进行了基本的研究
+      options:
+        - label: 我已经查看了项目文档
+          required: true
+        - label: 我已经搜索了现有的 issues 和讨论
+          required: true
+        - label: 我已经尝试了基本的故障排查步骤
+          required: false
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: ⏰ 紧急程度
+      description: 这个问题对您的工作影响程度如何？
+      options:
+        - 🔴 紧急 - 阻塞了重要工作
+        - 🟡 一般 - 希望尽快解决
+        - 🟢 不急 - 有时间慢慢解决
+
+  - type: checkboxes
+    id: help-type
+    attributes:
+      label: 🤝 需要的帮助类型
+      description: 您希望得到什么类型的帮助？
+      options:
+        - label: 解释概念或原理
+        - label: 提供代码示例
+        - label: 推荐最佳实践
+        - label: 故障排查指导
+        - label: 配置帮助
+        - label: 性能优化建议
+        - label: 架构设计建议
+        - label: 其他
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        **感谢您的提问！** 🙏
+        
+        我们会尽快回复您的问题。同时，您也可以：
+        
+        - 💬 在 [讨论区](https://github.com/aime4eve/Data-Fabric/discussions) 与社区交流
+        - 📚 查看 [详细文档](https://aime4eve.github.io/Data-Fabric/)
+        - 🔍 搜索 [已解决的问题](https://github.com/aime4eve/Data-Fabric/issues?q=is%3Aissue+is%3Aclosed)
+        
+        **回复时间预期：**
+        - 🔴 紧急问题：24小时内
+        - 🟡 一般问题：2-3个工作日
+        - 🟢 非紧急问题：1周内

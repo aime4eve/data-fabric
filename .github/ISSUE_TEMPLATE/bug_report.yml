@@ -1,0 +1,175 @@
+name: 🐛 Bug 报告
+description: 报告一个问题以帮助我们改进项目
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间填写这个 bug 报告！请尽可能详细地描述问题，这将帮助我们更快地定位和修复问题。
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: 🐛 问题描述
+      description: 请清楚简洁地描述这个 bug
+      placeholder: 描述您遇到的问题...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: 🔄 复现步骤
+      description: 请提供详细的步骤来复现这个问题
+      placeholder: |
+        1. 进入 '...'
+        2. 点击 '....'
+        3. 滚动到 '....'
+        4. 看到错误
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: ✅ 期望行为
+      description: 请清楚简洁地描述您期望发生什么
+      placeholder: 描述您期望的正确行为...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: ❌ 实际行为
+      description: 请描述实际发生了什么
+      placeholder: 描述实际发生的情况...
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 截图或录屏
+      description: 如果适用，请添加截图或录屏来帮助解释您的问题
+      placeholder: 拖拽图片到这里或粘贴图片链接...
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: 🎯 影响组件
+      description: 这个问题影响哪个组件？
+      options:
+        - 前端 (React)
+        - 后端 (Flask API)
+        - 数据库 (NebulaGraph)
+        - 缓存 (Redis)
+        - 文档
+        - CI/CD
+        - 部署
+        - 其他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 🚨 严重程度
+      description: 这个问题的严重程度如何？
+      options:
+        - 🔴 严重 - 系统崩溃或数据丢失
+        - 🟠 高 - 主要功能无法使用
+        - 🟡 中 - 功能受限但有替代方案
+        - 🟢 低 - 小问题或改进建议
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 📦 版本信息
+      description: 您使用的是哪个版本？
+      placeholder: "例如: v1.0.0, main 分支, commit hash"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: 🌐 浏览器
+      description: 在哪些浏览器中出现了这个问题？
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Opera
+        - 其他
+
+  - type: input
+    id: os
+    attributes:
+      label: 💻 操作系统
+      description: 您使用的操作系统
+      placeholder: "例如: macOS 13.0, Windows 11, Ubuntu 22.04"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 🔧 环境信息
+      description: 请提供相关的环境信息
+      placeholder: |
+        - Node.js 版本:
+        - Python 版本:
+        - Docker 版本:
+        - 其他相关信息:
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 📋 错误日志
+      description: 请粘贴相关的错误日志或控制台输出
+      render: shell
+      placeholder: 粘贴错误日志...
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📝 附加信息
+      description: 添加任何其他有关问题的上下文信息
+      placeholder: 任何其他相关信息...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: ✅ 检查清单
+      description: 在提交之前，请确认以下事项
+      options:
+        - label: 我已经搜索了现有的 issues，确认这不是重复问题
+          required: true
+        - label: 我已经阅读了贡献指南
+          required: true
+        - label: 我已经提供了足够的信息来复现这个问题
+          required: true
+        - label: 我愿意协助测试修复方案
+          required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        **感谢您的报告！** 🙏
+        
+        我们会尽快查看您的问题。如果您有任何补充信息，请随时添加评论。
+        
+        **有用的链接：**
+        - [文档](https://aime4eve.github.io/Data-Fabric/)
+        - [常见问题](https://github.com/aime4eve/Data-Fabric/wiki/FAQ)
+        - [讨论区](https://github.com/aime4eve/Data-Fabric/discussions)

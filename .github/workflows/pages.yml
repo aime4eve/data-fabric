@@ -1,0 +1,140 @@
+name: Deploy GitHub Pages
+
+on:
+  # 当推送到 main 分支时触发
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'README.md'
+      - '.github/workflows/pages.yml'
+  
+  # 允许手动触发
+  workflow_dispatch:
+
+# 设置 GITHUB_TOKEN 权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 只允许一个并发部署，跳过正在运行的部署队列中的运行
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # 构建作业
+  build:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # 获取完整历史记录用于 git info
+        
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1'
+        bundler-cache: true
+        
+    - name: Setup Pages
+      id: pages
+      uses: actions/configure-pages@v4
+      
+    - name: Install Jekyll dependencies
+      run: |
+        cd docs
+        gem install bundler
+        bundle init
+        echo 'gem "jekyll", "~> 4.3"' >> Gemfile
+        echo 'gem "minima", "~> 2.5"' >> Gemfile
+        echo 'gem "jekyll-feed", "~> 0.12"' >> Gemfile
+        echo 'gem "jekyll-sitemap"' >> Gemfile
+        echo 'gem "jekyll-seo-tag"' >> Gemfile
+        echo 'gem "jekyll-relative-links"' >> Gemfile
+        bundle install
+        
+    - name: Generate API documentation
+      run: |
+        echo "📚 Generating API documentation..."
+        # 这里可以添加自动生成 API 文档的脚本
+        # 例如：使用 swagger-codegen 或其他工具
+        
+    - name: Build Jekyll site
+      run: |
+        cd docs
+        bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+      env:
+        JEKYLL_ENV: production
+        
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: docs/_site
+
+  # 部署作业
+  deploy:
+    name: Deploy to GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      
+    - name: Verify deployment
+      run: |
+        echo "🚀 Documentation deployed successfully!"
+        echo "📖 Site URL: ${{ steps.deployment.outputs.page_url }}"
+        
+        # 验证部署是否成功
+        sleep 30
+        curl -f "${{ steps.deployment.outputs.page_url }}" || exit 1
+        echo "✅ Site is accessible and responding"
+
+  # 通知作业
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [build, deploy]
+    if: always()
+    
+    steps:
+    - name: Notify success
+      if: ${{ needs.deploy.result == 'success' }}
+      run: |
+        echo "✅ GitHub Pages Deployment Successful"
+        echo "📖 Documentation URL: ${{ needs.deploy.outputs.page_url }}"
+        echo ""
+        echo "Updated documentation includes:"
+        echo "- Project overview and features"
+        echo "- Installation guide"
+        echo "- Quick start tutorial"
+        echo "- API documentation"
+        echo "- Architecture diagrams"
+        echo ""
+        echo "This would send notifications to:"
+        echo "- Slack #documentation channel"
+        echo "- Email documentation team"
+        echo "- GitHub commit status"
+        
+    - name: Notify failure
+      if: ${{ needs.build.result == 'failure' || needs.deploy.result == 'failure' }}
+      run: |
+        echo "❌ GitHub Pages Deployment Failed"
+        echo ""
+        echo "Build Status: ${{ needs.build.result }}"
+        echo "Deploy Status: ${{ needs.deploy.result }}"
+        echo ""
+        echo "This would:"
+        echo "- Create issue in repository"
+        echo "- Send alert to documentation team"
+        echo "- Update deployment status badge"

@@ -1,0 +1,222 @@
+name: 🚀 功能请求
+description: 为这个项目建议一个新功能或改进
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您提出功能建议！我们重视每一个改进项目的想法。请详细描述您的建议，这将帮助我们更好地理解和评估您的需求。
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: 🎯 功能描述
+      description: 请清楚简洁地描述您希望添加的功能
+      placeholder: 描述您想要的功能...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: 🤔 问题陈述
+      description: 这个功能要解决什么问题？您当前遇到了什么困难？
+      placeholder: |
+        例如：我总是感到沮丧，当我...
+        或者：当我尝试...时，很难...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: 💡 建议的解决方案
+      description: 请描述您希望如何实现这个功能
+      placeholder: 详细描述您的解决方案...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 替代方案
+      description: 您是否考虑过其他替代解决方案？
+      placeholder: 描述您考虑过的其他方案...
+
+  - type: dropdown
+    id: feature-type
+    attributes:
+      label: 📂 功能类型
+      description: 这个功能属于哪个类别？
+      options:
+        - 🎨 用户界面改进
+        - ⚡ 性能优化
+        - 🔧 API 功能
+        - 📊 数据分析功能
+        - 🔍 搜索功能
+        - 📈 可视化功能
+        - 🔐 安全功能
+        - 🛠️ 开发工具
+        - 📱 移动端功能
+        - 🌐 国际化
+        - 📚 文档改进
+        - 🧪 测试功能
+        - 其他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 🎯 优先级
+      description: 您认为这个功能的优先级如何？
+      options:
+        - 🔴 高 - 对项目成功至关重要
+        - 🟡 中 - 重要但不紧急
+        - 🟢 低 - 很好有，但不是必需的
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: 🧩 预估复杂度
+      description: 您认为实现这个功能的复杂度如何？
+      options:
+        - 🟢 简单 - 几小时到1天
+        - 🟡 中等 - 几天到1周
+        - 🟠 复杂 - 1-4周
+        - 🔴 非常复杂 - 超过1个月
+        - 🤷 不确定
+
+  - type: textarea
+    id: user-stories
+    attributes:
+      label: 👤 用户故事
+      description: 请以用户故事的形式描述这个功能
+      placeholder: |
+        作为一个 [用户类型]，
+        我想要 [功能]，
+        以便 [目标/好处]。
+        
+        例如：
+        作为一个数据分析师，
+        我想要能够导出查询结果为CSV格式，
+        以便我可以在Excel中进一步分析数据。
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: ✅ 验收标准
+      description: 什么条件下可以认为这个功能已经完成？
+      placeholder: |
+        - [ ] 用户可以...
+        - [ ] 系统应该...
+        - [ ] 当...时，应该...
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: 🎨 界面设计或原型
+      description: 如果涉及UI，请提供设计稿、原型或描述
+      placeholder: 拖拽图片到这里或粘贴设计链接...
+
+  - type: textarea
+    id: technical-considerations
+    attributes:
+      label: 🔧 技术考虑
+      description: 是否有特定的技术要求或限制？
+      placeholder: |
+        - 需要使用特定的库或框架
+        - 性能要求
+        - 兼容性要求
+        - 安全考虑
+
+  - type: textarea
+    id: impact-analysis
+    attributes:
+      label: 📊 影响分析
+      description: 这个功能可能对现有系统产生什么影响？
+      placeholder: |
+        - 对现有功能的影响
+        - 对性能的影响
+        - 对用户体验的影响
+        - 对维护成本的影响
+
+  - type: checkboxes
+    id: affected-components
+    attributes:
+      label: 🎯 涉及组件
+      description: 这个功能可能涉及哪些组件？
+      options:
+        - label: 前端 (React)
+        - label: 后端 (Flask API)
+        - label: 数据库 (NebulaGraph)
+        - label: 缓存 (Redis)
+        - label: 搜索引擎 (Elasticsearch)
+        - label: 文件存储
+        - label: 认证系统
+        - label: 监控系统
+        - label: CI/CD 流程
+        - label: 文档
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📝 附加信息
+      description: 添加任何其他相关的上下文、链接或参考资料
+      placeholder: |
+        - 相关的 issues 或 PRs
+        - 参考资料或文档
+        - 类似功能的实现示例
+        - 其他相关信息
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: 🤝 贡献意愿
+      description: 您是否愿意参与这个功能的开发？
+      options:
+        - label: 我愿意提供更多的需求细节
+        - label: 我愿意参与设计讨论
+        - label: 我愿意编写代码实现
+        - label: 我愿意编写测试
+        - label: 我愿意编写文档
+        - label: 我愿意参与测试验证
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: ✅ 检查清单
+      description: 在提交之前，请确认以下事项
+      options:
+        - label: 我已经搜索了现有的 issues，确认这不是重复请求
+          required: true
+        - label: 我已经阅读了项目路线图，确认这符合项目方向
+          required: true
+        - label: 我已经考虑了这个功能对现有用户的影响
+          required: true
+        - label: 我提供了足够的细节来理解这个功能需求
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        **感谢您的建议！** 🙏
+        
+        我们会仔细评估您的功能请求。请注意：
+        
+        - 🔍 我们会根据项目路线图和资源情况来评估优先级
+        - 💬 可能会有进一步的讨论来完善需求
+        - 🤝 欢迎您参与功能的设计和实现过程
+        
+        **有用的链接：**
+        - [项目路线图](https://github.com/aime4eve/Data-Fabric/projects)
+        - [贡献指南](https://github.com/aime4eve/Data-Fabric/blob/main/CONTRIBUTING.md)
+        - [架构文档](https://aime4eve.github.io/Data-Fabric/architecture)
+        - [讨论区](https://github.com/aime4eve/Data-Fabric/discussions)
