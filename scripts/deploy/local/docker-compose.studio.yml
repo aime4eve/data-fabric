@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  # Nebula Studio (可视化界面)
+  nebula-studio:
+    image: vesoft/nebula-graph-studio:v3.8.0
+    container_name: knowledge-base-nebula-studio
+    ports:
+      - "7001:7001"
+    networks:
+      - knowledge-base-network
+    depends_on:
+      - nebula-graph
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+
+networks:
+  knowledge-base-network:
+    external: true
+    name: knowledge-base-app_knowledge-base-network

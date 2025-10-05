@@ -1,0 +1,471 @@
+name: Automated Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Frontend Unit Tests
+  frontend-unit-tests:
+    name: Frontend Unit Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        npm ci
+        
+    - name: Run frontend unit tests
+      run: |
+        npm run test:unit:frontend
+        
+    - name: Upload frontend test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: frontend-unit-test-results
+        path: |
+          scripts/test/reports/jest-report.html
+          scripts/test/reports/coverage/
+        retention-days: 30
+
+  # Backend Unit Tests
+  backend-unit-tests:
+    name: Backend Unit Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
+      elasticsearch:
+        image: elasticsearch:8.11.0
+        ports:
+          - 9200:9200
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: false
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
+        options: >-
+          --health-cmd "curl -f http://localhost:9200/_cluster/health"
+          --health-interval 30s
+          --health-timeout 10s
+          --health-retries 5
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-html pytest-xvfb
+        
+    - name: Wait for services
+      run: |
+        # Wait for Elasticsearch
+        timeout 60 bash -c 'until curl -f http://localhost:9200/_cluster/health; do sleep 2; done'
+        # Wait for Redis
+        timeout 30 bash -c 'until redis-cli -h localhost ping; do sleep 1; done'
+        
+    - name: Run backend unit tests
+      run: |
+        cd scripts/test
+        python -m pytest tests/unit/backend/ -v --cov=api --cov-report=html --cov-report=xml --html=reports/pytest-report.html --self-contained-html
+      env:
+        TESTING: true
+        DATABASE_URL: sqlite:///:memory:
+        REDIS_URL: redis://localhost:6379/0
+        ELASTICSEARCH_URL: http://localhost:9200
+        
+    - name: Upload backend test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: backend-unit-test-results
+        path: |
+          scripts/test/reports/pytest-report.html
+          scripts/test/reports/coverage/
+          scripts/test/reports/coverage.xml
+        retention-days: 30
+
+  # Integration Tests
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [frontend-unit-tests, backend-unit-tests]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_USER: testuser
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
+      elasticsearch:
+        image: elasticsearch:8.11.0
+        ports:
+          - 9200:9200
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: false
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
+        options: >-
+          --health-cmd "curl -f http://localhost:9200/_cluster/health"
+          --health-interval 30s
+          --health-timeout 10s
+          --health-retries 5
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: Install dependencies
+      run: |
+        npm ci
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-html
+        
+    - name: Wait for services
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:9200/_cluster/health; do sleep 2; done'
+        timeout 30 bash -c 'until redis-cli -h localhost ping; do sleep 1; done'
+        timeout 30 bash -c 'until pg_isready -h localhost -p 5432 -U testuser; do sleep 1; done'
+        
+    - name: Setup test database
+      run: |
+        PGPASSWORD=testpassword psql -h localhost -U testuser -d testdb -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
+      env:
+        PGPASSWORD: testpassword
+        
+    - name: Start backend server
+      run: |
+        cd api
+        python app.py &
+        sleep 10
+      env:
+        FLASK_ENV: testing
+        DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+        REDIS_URL: redis://localhost:6379/0
+        ELASTICSEARCH_URL: http://localhost:9200
+        
+    - name: Run integration tests
+      run: |
+        cd scripts/test
+        python -m pytest tests/integration/ -v --html=reports/integration-report.html --self-contained-html
+      env:
+        TESTING: true
+        API_BASE_URL: http://localhost:5000
+        DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+        REDIS_URL: redis://localhost:6379/0
+        ELASTICSEARCH_URL: http://localhost:9200
+        
+    - name: Upload integration test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: integration-test-results
+        path: |
+          scripts/test/reports/integration-report.html
+        retention-days: 30
+
+  # E2E Tests
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [integration-tests]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_USER: testuser
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
+      elasticsearch:
+        image: elasticsearch:8.11.0
+        ports:
+          - 9200:9200
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: false
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
+        options: >-
+          --health-cmd "curl -f http://localhost:9200/_cluster/health"
+          --health-interval 30s
+          --health-timeout 10s
+          --health-retries 5
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: Install dependencies
+      run: |
+        npm ci
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Install Playwright browsers
+      run: |
+        cd scripts/test
+        npm install
+        npx playwright install --with-deps
+        
+    - name: Wait for services
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:9200/_cluster/health; do sleep 2; done'
+        timeout 30 bash -c 'until redis-cli -h localhost ping; do sleep 1; done'
+        timeout 30 bash -c 'until pg_isready -h localhost -p 5432 -U testuser; do sleep 1; done'
+        
+    - name: Setup test database
+      run: |
+        PGPASSWORD=testpassword psql -h localhost -U testuser -d testdb -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
+      env:
+        PGPASSWORD: testpassword
+        
+    - name: Start backend server
+      run: |
+        cd api
+        python app.py &
+        sleep 10
+      env:
+        FLASK_ENV: testing
+        DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+        REDIS_URL: redis://localhost:6379/0
+        ELASTICSEARCH_URL: http://localhost:9200
+        
+    - name: Start frontend server
+      run: |
+        npm run build
+        npm run preview &
+        sleep 10
+      env:
+        VITE_API_BASE_URL: http://localhost:5000
+        
+    - name: Wait for servers
+      run: |
+        timeout 30 bash -c 'until curl -f http://localhost:5000/health; do sleep 2; done'
+        timeout 30 bash -c 'until curl -f http://localhost:4173; do sleep 2; done'
+        
+    - name: Run E2E tests
+      run: |
+        cd scripts/test
+        npx playwright test --reporter=html
+      env:
+        BASE_URL: http://localhost:4173
+        API_BASE_URL: http://localhost:5000
+        TEST_USERNAME: testuser
+        TEST_PASSWORD: testpass123
+        ADMIN_USERNAME: admin
+        ADMIN_PASSWORD: adminpass123
+        
+    - name: Upload E2E test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: e2e-test-results
+        path: |
+          scripts/test/playwright-report/
+          scripts/test/test-results/
+        retention-days: 30
+
+  # Test Summary
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [frontend-unit-tests, backend-unit-tests, integration-tests, e2e-tests]
+    if: always()
+    
+    steps:
+    - name: Download all test artifacts
+      uses: actions/download-artifact@v4
+      
+    - name: Generate test summary
+      run: |
+        echo "# Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Test Status" >> $GITHUB_STEP_SUMMARY
+        echo "- Frontend Unit Tests: ${{ needs.frontend-unit-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Backend Unit Tests: ${{ needs.backend-unit-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Integration Tests: ${{ needs.integration-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- E2E Tests: ${{ needs.e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "Test reports and coverage data are available in the artifacts section." >> $GITHUB_STEP_SUMMARY
+        
+    - name: Comment PR with test results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { owner, repo, number } = context.issue;
+          const frontendStatus = '${{ needs.frontend-unit-tests.result }}';
+          const backendStatus = '${{ needs.backend-unit-tests.result }}';
+          const integrationStatus = '${{ needs.integration-tests.result }}';
+          const e2eStatus = '${{ needs.e2e-tests.result }}';
+          
+          const getStatusEmoji = (status) => {
+            switch(status) {
+              case 'success': return '✅';
+              case 'failure': return '❌';
+              case 'cancelled': return '⏹️';
+              case 'skipped': return '⏭️';
+              default: return '❓';
+            }
+          };
+          
+          const body = `## 🧪 Test Results
+          
+          | Test Type | Status |
+          |-----------|--------|
+          | Frontend Unit Tests | ${getStatusEmoji(frontendStatus)} ${frontendStatus} |
+          | Backend Unit Tests | ${getStatusEmoji(backendStatus)} ${backendStatus} |
+          | Integration Tests | ${getStatusEmoji(integrationStatus)} ${integrationStatus} |
+          | E2E Tests | ${getStatusEmoji(e2eStatus)} ${e2eStatus} |
+          
+          📊 Detailed test reports are available in the [Actions artifacts](${context.payload.pull_request.html_url}/checks).
+          `;
+          
+          github.rest.issues.createComment({
+            owner,
+            repo,
+            issue_number: number,
+            body
+          });
+
+  # Security Scan
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+        
+    - name: Run npm audit
+      run: |
+        npm audit --audit-level=high
+        
+    - name: Run Python safety check
+      run: |
+        pip install safety
+        safety check --json --output safety-report.json || true
+        
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-scan-results
+        path: |
+          trivy-results.sarif
+          safety-report.json
+        retention-days: 30

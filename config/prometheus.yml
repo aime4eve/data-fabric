@@ -1,0 +1,50 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 监控后端API服务
+  - job_name: 'knowledge-base-backend'
+    static_configs:
+      - targets: ['backend:5000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # 监控前端服务
+  - job_name: 'knowledge-base-frontend'
+    static_configs:
+      - targets: ['frontend:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # 监控PostgreSQL数据库
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # 监控Redis缓存
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # 监控NebulaGraph
+  - job_name: 'nebula-graph'
+    static_configs:
+      - targets: ['nebula-graph:19669']
+    scrape_interval: 30s
+    scrape_timeout: 10s

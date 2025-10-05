@@ -1,0 +1,88 @@
+{
+  "name": "knowledge-base-test-suite",
+  "version": "1.0.0",
+  "description": "Comprehensive test suite for Knowledge Base Management System",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:unit": "npm run test:unit:frontend && npm run test:unit:backend",
+    "test:unit:frontend": "jest --config=jest.config.js --testPathPattern=tests/unit/frontend",
+    "test:unit:backend": "python -m pytest tests/unit/backend/ -v",
+    "test:integration": "python -m pytest tests/integration/ -v",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:ui": "playwright test --ui",
+    "test:coverage": "npm run test:coverage:frontend && npm run test:coverage:backend",
+    "test:coverage:frontend": "jest --config=jest.config.js --coverage --testPathPattern=tests/unit/frontend",
+    "test:coverage:backend": "python -m pytest tests/unit/backend/ --cov=api --cov-report=html --cov-report=term",
+    "test:watch": "jest --config=jest.config.js --watch --testPathPattern=tests/unit/frontend",
+    "test:ci": "npm run test:unit:frontend && npm run test:unit:backend && npm run test:integration && npm run test:e2e:ci",
+    "test:e2e:ci": "playwright test --reporter=html",
+    "playwright:install": "playwright install",
+    "playwright:install-deps": "playwright install-deps",
+    "playwright:codegen": "playwright codegen",
+    "playwright:show-report": "playwright show-report",
+    "lint": "eslint tests/ --ext .js,.ts,.tsx",
+    "lint:fix": "eslint tests/ --ext .js,.ts,.tsx --fix",
+    "format": "prettier --write \"tests/**/*.{js,ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"tests/**/*.{js,ts,tsx,json,md}\"",
+    "clean": "rimraf reports/ test-results/ playwright-report/ coverage/ .nyc_output/",
+    "setup": "npm install && npm run playwright:install",
+    "validate": "npm run lint && npm run format:check && npm run test:ci"
+  },
+  "keywords": [
+    "testing",
+    "playwright",
+    "jest",
+    "pytest",
+    "e2e",
+    "integration",
+    "unit",
+    "automation"
+  ],
+  "author": "Knowledge Base Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/jest": "^29.5.8",
+    "@types/node": "^20.9.0",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/parser": "^6.11.0",
+    "axios": "^1.6.0",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-jest": "^27.6.0",
+    "eslint-plugin-playwright": "^0.18.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-html-reporter": "^3.10.2",
+    "prettier": "^3.1.0",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "faker": "^6.6.6"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/knowledge-base-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/knowledge-base-app/issues"
+  },
+  "homepage": "https://github.com/your-org/knowledge-base-app#readme"
+}
