@@ -11,8 +11,10 @@ import { MainLayout } from './components/Layout/MainLayout';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
-import { DocumentManagement } from './pages/DocumentManagement';
 import { DocumentUpload } from './pages/DocumentUpload';
+import { DocumentManagement } from './pages/DocumentManagement';
+import DocumentDetail from './pages/DocumentDetail';
+import DocumentEdit from './pages/DocumentEdit';
 import { SearchPage } from './pages/Search';
 import { KnowledgeGraph } from './pages/KnowledgeGraph';
 import { CategoryManagement } from './pages/CategoryManagement';
@@ -105,6 +107,36 @@ function App() {
                   <ProtectedRoute>
                     <MainLayout>
                       <DocumentUpload />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/upload"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <DocumentUpload />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/documents/:id/edit"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <DocumentEdit />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/documents/:id"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <DocumentDetail />
                     </MainLayout>
                   </ProtectedRoute>
                 }

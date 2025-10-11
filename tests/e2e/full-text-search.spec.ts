@@ -76,7 +76,7 @@ test.describe('全文检索功能测试', () => {
       }
       
       // 检查结果统计信息
-      const resultStats = page.locator('.search-stats, .result-count, text*="找到"');
+      const resultStats = page.locator('.search-stats, .result-count');
       if (await resultStats.count() > 0) {
         await expect(resultStats.first()).toBeVisible();
       }

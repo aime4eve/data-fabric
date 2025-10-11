@@ -1,7 +1,8 @@
 """
 文档控制器
 """
-from flask import request, jsonify
+import os
+from flask import request, jsonify, send_file
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.datastructures import FileStorage
@@ -88,8 +89,9 @@ class DocumentListResource(Resource):
                     'metadata': doc.metadata
                 })
             
-            # 获取总数（简化实现，实际应该从repository获取）
-            total_count = len(document_data)
+            # 获取总数
+            from infrastructure.persistence.models import DocumentModel
+            total_count = DocumentModel.query.count()
             
             return {
                 'success': True,
@@ -135,21 +137,41 @@ class DocumentResource(Resource):
     """单个文档接口"""
     
     @jwt_required()
-    @document_ns.marshal_with(document_model)
     def get(self, document_id):
         """获取文档详情"""
         try:
-            # TODO: 实现文档详情获取逻辑
+            current_user_id = get_jwt_identity()
+            service = get_document_service()
+            
+            # 获取文档信息
+            document = service.get_document_info(document_id)
+            if not document:
+                return {
+                    'success': False,
+                    'message': '文档不存在或已被删除'
+                }, 404
+            
+            # 返回文档详情 - 保持与前端期望的格式一致
             return {
-                'id': document_id,
-                'title': f'文档 {document_id}',
-                'content_path': f'/documents/{document_id}.md',
-                'status': 'published',
-                'created_at': '2025-01-01T00:00:00Z',
-                'updated_at': '2025-01-01T00:00:00Z'
+                'success': True,
+                'message': '获取文档详情成功',
+                'data': {
+                    'id': str(document.id),
+                    'title': document.title,
+                    'content_path': document.content_path,
+                    'status': document.status.value,
+                    'created_at': document.created_at.isoformat() + 'Z',
+                    'updated_at': document.updated_at.isoformat() + 'Z',
+                    'metadata': document.metadata,
+                    'author_id': document.author_id,
+                    'category_id': document.category_id
+                }
             }, 200
         except Exception as e:
-            return {'error': str(e)}, 500
+            return {
+                'success': False,
+                'message': f'获取文档详情失败: {str(e)}'
+            }, 500
     
     @jwt_required()
     @document_ns.expect(document_model)
@@ -182,246 +204,81 @@ class DocumentResource(Resource):
 @document_ns.route('/upload')
 class DocumentUploadResource(Resource):
     """文档上传接口"""
-    
+
     @jwt_required()
-    @document_ns.marshal_with(document_upload_response)
     def post(self):
         """上传文档"""
+        print("Received file upload request")
+        print(f"Request headers: {request.headers}")
+        print(f"Request form: {request.form}")
+        print(f"Request files: {request.files}")
         try:
-            # 获取当前用户ID
             current_user_id = get_jwt_identity()
-            
+
             # 检查是否有文件上传
             if 'file' not in request.files:
-                return {
-                    'success': False,
-                    'message': '没有上传文件',
-                    'data': None
-                }, 400
-            
+                print("No file part in request")
+                return {'success': False, 'message': '没有上传文件'}, 400
+
             file = request.files['file']
             if file.filename == '':
-                return {
-                    'success': False,
-                    'message': '没有选择文件',
-                    'data': None
-                }, 400
-            
-            # 获取表单数据
+                print("No selected file")
+                return {'success': False, 'message': '没有选择文件'}, 400
+
+            # 从表单数据中获取参数
             title = request.form.get('title', file.filename)
             description = request.form.get('description', '')
-            category_id = request.form.get('category_id', '')
+            category_id = request.form.get('category_id')
             upload_directory = request.form.get('upload_directory', '')
-            
-            # 验证必填字段
+
+            print(f"Title: {title}")
+            print(f"Description: {description}")
+            print(f"Category ID: {category_id}")
+            print(f"Upload Directory: {upload_directory}")
+
+            # 验证必要参数
             if not title:
-                return {
-                    'success': False,
-                    'message': '文档标题不能为空',
-                    'data': None
-                }, 400
-            
-            # 检查文件类型
-            allowed_extensions = {
-                'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 
-                'txt', 'md', 'rtf', 'odt', 'ods', 'odp'
-            }
-            
-            file_extension = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
-            if file_extension not in allowed_extensions:
-                return {
-                    'success': False,
-                    'message': f'不支持的文件类型: {file_extension}。支持的类型: {", ".join(allowed_extensions)}',
-                    'data': None
-                }, 400
-            
-            # 检查文件大小 (限制为50MB)
-            max_file_size = 50 * 1024 * 1024  # 50MB
-            file.seek(0, 2)  # 移动到文件末尾
-            file_size = file.tell()
-            file.seek(0)  # 重置文件指针
-            
-            if file_size > max_file_size:
-                return {
-                    'success': False,
-                    'message': f'文件大小超过限制 (最大50MB)，当前文件大小: {file_size / (1024*1024):.2f}MB',
-                    'data': None
-                }, 400
-            
-            # 实际文件保存逻辑
-            import uuid
-            import os
-            from datetime import datetime
-            
-            # 确定文件保存路径
-            base_path = '/root/knowledge-base-app/company_knowledge_base'
-            if upload_directory:
-                # 使用用户选择的目录
-                save_directory = os.path.join(base_path, upload_directory)
-            else:
-                # 默认保存到根目录
-                save_directory = base_path
-            
-            # 确保目录存在
-            os.makedirs(save_directory, exist_ok=True)
-            
-            # 生成唯一文件名
-            document_id = str(uuid.uuid4())
-            file_extension = os.path.splitext(file.filename)[1]
-            unique_filename = f"{document_id}_{file.filename}"
-            file_path = os.path.join(save_directory, unique_filename)
-            
-            # 保存文件
-            file.save(file_path)
-            
-            # 相对路径用于数据库存储
-            relative_path = os.path.relpath(file_path, base_path)
-            
-            # 使用DocumentService保存到数据库
-            try:
-                # 重置文件指针以便DocumentService读取
-                file.seek(0)
-                
-                # 创建文档实体并直接保存到数据库
-                from domain.entities.document import Document
-                import uuid
-                from datetime import datetime
-                
-                document = Document(
-                    id=str(uuid.uuid4()),
-                    title=title,
-                    content_path=relative_path,
-                    category_id=category_id or 'default',
-                    author_id=current_user_id,
-                    status=DocumentStatus.DRAFT,
-                    metadata={
-                        'original_filename': file.filename,
-                        'content_type': file.content_type,
-                        'file_size': file_size,
-                        'description': description,
-                        'upload_directory': upload_directory,
-                        'full_path': file_path
-                    }
-                )
-                
-                # 保存文档到数据库
-                service = get_document_service()
-                document = service.document_repository.save(document)
-                
-                # 构建响应数据
-                document_data = {
+                print("Title is missing")
+                return {'success': False, 'message': '文档标题不能为空'}, 400
+            if not category_id:
+                print("Category ID is missing")
+                return {'success': False, 'message': '目录ID不能为空'}, 400
+
+            # 调用服务层处理文档上传
+            service = get_document_service()
+            document = service.upload_document(
+                file_data=file.stream,
+                filename=file.filename,
+                title=title,
+                description=description,
+                category_id=category_id,
+                author_id=current_user_id,
+                upload_directory=upload_directory,
+                content_type=file.content_type
+            )
+
+            # 返回成功响应
+            return {
+                'success': True,
+                'message': '文档上传成功',
+                'data': {
                     'id': str(document.id),
                     'title': document.title,
                     'content_path': document.content_path,
                     'status': document.status.value,
                     'created_at': document.created_at.isoformat() + 'Z',
                     'updated_at': document.updated_at.isoformat() + 'Z',
-                    'metadata': document.metadata
+                    'metadata': document.metadata,
+                    'author_id': str(document.author_id),
+                    'category_id': str(document.category_id)
                 }
-                
-                return {
-                    'success': True,
-                    'message': '文档上传成功',
-                    'data': document_data
-                }, 201
-                
-            except Exception as db_error:
-                # 如果数据库保存失败，删除已保存的文件
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-                raise Exception(f"数据库保存失败: {str(db_error)}")
-            
-        except Exception as e:
-            return {
-                'success': False,
-                'message': f'文档上传失败: {str(e)}',
-                'data': None
-            }, 500
+            }, 201
 
-@document_ns.route('/search')
-class DocumentSearchResource(Resource):
-    """文档搜索接口"""
-    
-    @document_ns.marshal_with(document_list_response)
-    def get(self):
-        """搜索文档"""
-        try:
-            # 获取查询参数
-            query = request.args.get('query', '').strip()
-            category_id = request.args.get('category_id')
-            author_id = request.args.get('author_id')
-            status = request.args.get('status')
-            page = int(request.args.get('page', 1))
-            size = int(request.args.get('size', 20))
-            
-            # 验证查询参数
-            if not query:
-                return {
-                    'success': False,
-                    'message': '搜索关键词不能为空',
-                    'data': [],
-                    'total': 0,
-                    'page': page,
-                    'size': size
-                }, 400
-            
-            # 转换状态参数
-            document_status = None
-            if status:
-                try:
-                    document_status = DocumentStatus(status)
-                except ValueError:
-                    return {
-                        'success': False,
-                        'message': f'无效的文档状态: {status}',
-                        'data': [],
-                        'total': 0,
-                        'page': page,
-                        'size': size
-                    }, 400
-            
-            # 执行搜索
-            service = get_document_service()
-            documents = service.search_documents(
-                query=query,
-                category_id=category_id,
-                author_id=author_id,
-                status=document_status,
-                page=page,
-                size=size
-            )
-            
-            # 转换为响应格式
-            document_data = []
-            for doc in documents:
-                document_data.append({
-                    'id': str(doc.id),
-                    'title': doc.title,
-                    'content_path': doc.content_path,
-                    'status': doc.status.value,
-                    'created_at': doc.created_at.isoformat() + 'Z',
-                    'updated_at': doc.updated_at.isoformat() + 'Z',
-                    'metadata': doc.metadata
-                })
-            
-            return {
-                'success': True,
-                'message': f'搜索到 {len(document_data)} 个文档',
-                'data': document_data,
-                'total': len(document_data),
-                'page': page,
-                'size': size
-            }, 200
-            
         except Exception as e:
-            return {
-                'success': False,
-                'message': f'搜索文档失败: {str(e)}',
-                'data': [],
-                'total': 0,
-                'page': 1,
-                'size': 20
-            }, 500
+            import traceback
+            traceback.print_exc()
+            return {'success': False, 'message': f'服务器内部错误: {str(e)}'}, 500
+
 
 @document_ns.route('/statistics')
 class DocumentStatisticsResource(Resource):
@@ -447,4 +304,136 @@ class DocumentStatisticsResource(Resource):
                 'success': False,
                 'message': f'获取文档统计失败: {str(e)}',
                 'data': {}
+            }, 500
+
+@document_ns.route('/<string:document_id>/download')
+class DocumentDownloadResource(Resource):
+    """文档下载接口"""
+    
+    @jwt_required()
+    def get(self, document_id):
+        """下载文档文件"""
+        try:
+            current_user_id = get_jwt_identity()
+            service = get_document_service()
+            
+            # 获取文档信息
+            document = service.get_document_info(document_id)
+            if not document:
+                return {
+                    'success': False,
+                    'message': '文档不存在'
+                }, 404
+            
+            # 构建文件路径
+            import os
+            base_path = '/root/knowledge-base-app/company_knowledge_base'
+            file_path = os.path.join(base_path, document.content_path)
+            
+            if not os.path.exists(file_path):
+                return {
+                    'success': False,
+                    'message': '文件不存在'
+                }, 404
+            
+            # 返回文件
+            from flask import send_file
+            return send_file(
+                file_path,
+                as_attachment=True,
+                download_name=document.metadata.get('original_filename', document.title)
+            )
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'message': f'下载文件失败: {str(e)}'
+            }, 500
+
+@document_ns.route('/<string:document_id>/preview')
+class DocumentPreviewResource(Resource):
+    """文档预览接口"""
+    
+    @jwt_required()
+    def get(self, document_id):
+        """预览文档文件"""
+        try:
+            current_user_id = get_jwt_identity()
+            service = get_document_service()
+            
+            # 获取文档信息
+            document = service.get_document_info(document_id)
+            if not document:
+                return {
+                    'success': False,
+                    'message': '文档不存在'
+                }, 404
+            
+            # 构建文件路径
+            import os
+            base_path = '/root/knowledge-base-app/company_knowledge_base'
+            file_path = os.path.join(base_path, document.content_path)
+            
+            if not os.path.exists(file_path):
+                return {
+                    'success': False,
+                    'message': '文件不存在'
+                }, 404
+            
+            # 返回文件用于预览
+            from flask import send_file
+            return send_file(file_path)
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'message': f'预览文件失败: {str(e)}'
+            }, 500
+
+@document_ns.route('/file-preview')
+class FilePreviewResource(Resource):
+    """通用文件预览接口（通过文件路径）"""
+    
+    def get(self):
+        """通过文件路径预览文件"""
+        try:
+            file_path = request.args.get('path')
+            if not file_path:
+                return {
+                    'success': False,
+                    'message': '文件路径不能为空'
+                }, 400
+            
+            # 安全检查：确保文件路径在允许的目录内
+            base_path = '/root/knowledge-base-app/company_knowledge_base'
+            
+            # 如果是相对路径，转换为绝对路径
+            if not file_path.startswith('/'):
+                full_path = os.path.join(base_path, file_path)
+            else:
+                full_path = file_path
+            
+            # 安全检查：确保路径在基础目录内
+            full_path = os.path.abspath(full_path)
+            base_path = os.path.abspath(base_path)
+            
+            if not full_path.startswith(base_path):
+                return {
+                    'success': False,
+                    'message': '无权访问该文件'
+                }, 403
+            
+            if not os.path.exists(full_path):
+                return {
+                    'success': False,
+                    'message': '文件不存在'
+                }, 404
+            
+            # 返回文件用于预览
+            return send_file(full_path)
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'message': f'预览文件失败: {str(e)}'
             }, 500

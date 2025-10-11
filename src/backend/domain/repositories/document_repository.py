@@ -81,3 +81,13 @@ class DocumentRepository(ABC):
     def count_by_author(self, author_id: str) -> int:
         """统计作者的文档数量"""
         pass
+    
+    @abstractmethod
+    def count_by_status(self, status: DocumentStatus = None) -> int:
+        """统计指定状态的文档数量"""
+        pass
+    
+    @abstractmethod
+    def get_document_statistics(self) -> dict:
+        """获取文档统计信息"""
+        pass

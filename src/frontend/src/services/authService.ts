@@ -17,41 +17,41 @@ export class AuthService {
   /**
    * 用户登录
    */
-  static async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>('/auth/login', credentials);
-    return response.data;
+  static async login(data: LoginRequest): Promise<LoginResponse> {
+    const response = await api.post('/auth/login', data);
+    return response.data as LoginResponse;
   }
 
   /**
    * 用户注册
    */
-  static async register(userData: RegisterRequest): Promise<RegisterResponse> {
-    const response = await api.post<RegisterResponse>('/auth/register', userData);
-    return response.data;
+  static async register(data: RegisterRequest): Promise<RegisterResponse> {
+    const response = await api.post('/auth/register', data);
+    return response.data as RegisterResponse;
   }
 
   /**
    * 刷新令牌
    */
-  static async refreshToken(refreshTokenData: RefreshTokenRequest): Promise<RefreshTokenResponse> {
-    const response = await api.post<RefreshTokenResponse>('/auth/refresh', refreshTokenData);
-    return response.data;
+  static async refreshToken(data: RefreshTokenRequest): Promise<RefreshTokenResponse> {
+    const response = await api.post('/auth/refresh', data);
+    return response.data as RefreshTokenResponse;
   }
 
   /**
    * 修改密码
    */
-  static async changePassword(passwordData: ChangePasswordRequest): Promise<{ success: boolean; message: string }> {
-    const response = await api.post('/auth/change-password', passwordData);
-    return response.data;
+  static async changePassword(data: ChangePasswordRequest): Promise<void> {
+    const response = await api.post('/auth/change-password', data);
+    // 不需要返回数据
   }
 
   /**
-   * 获取用户信息
+   * 获取用户资料
    */
   static async getProfile(): Promise<ProfileResponse> {
-    const response = await api.get<ProfileResponse>('/auth/profile');
-    return response.data;
+    const response = await api.get('/auth/profile');
+    return response.data as unknown as ProfileResponse;
   }
 
   /**

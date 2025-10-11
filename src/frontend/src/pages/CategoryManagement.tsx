@@ -337,7 +337,7 @@ export const CategoryManagement: React.FC = () => {
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="p-6" data-testid="category-management-page">
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-gray-900">分类管理</h1>
@@ -345,6 +345,7 @@ export const CategoryManagement: React.FC = () => {
             type="primary"
             icon={<PlusOutlined />}
             onClick={handleCreate}
+            data-testid="create-category-button"
           >
             新建分类
           </Button>
@@ -353,7 +354,7 @@ export const CategoryManagement: React.FC = () => {
         {/* 统计卡片 */}
         <Row gutter={16} className="mb-6">
           <Col xs={24} sm={6}>
-            <Card>
+            <Card data-testid="total-categories-card">
               <Statistic
                 title="总分类数"
                 value={stats.total}
@@ -362,7 +363,7 @@ export const CategoryManagement: React.FC = () => {
             </Card>
           </Col>
           <Col xs={24} sm={6}>
-            <Card>
+            <Card data-testid="active-categories-card">
               <Statistic
                 title="启用分类"
                 value={stats.active}
@@ -372,7 +373,7 @@ export const CategoryManagement: React.FC = () => {
             </Card>
           </Col>
           <Col xs={24} sm={6}>
-            <Card>
+            <Card data-testid="inactive-categories-card">
               <Statistic
                 title="禁用分类"
                 value={stats.inactive}
@@ -382,7 +383,7 @@ export const CategoryManagement: React.FC = () => {
             </Card>
           </Col>
           <Col xs={24} sm={6}>
-            <Card>
+            <Card data-testid="total-documents-card">
               <Statistic
                 title="总文档数"
                 value={stats.totalDocuments}
@@ -401,15 +402,20 @@ export const CategoryManagement: React.FC = () => {
             <Button
               icon={<DragOutlined />}
               onClick={() => message.info('拖拽排序功能开发中')}
+              data-testid="sort-mode-button"
             >
               排序模式
             </Button>
-            <Button onClick={loadCategories}>
+            <Button 
+              onClick={loadCategories}
+              data-testid="refresh-categories-button"
+            >
               刷新
             </Button>
           </Space>
         }
         loading={loading}
+        data-testid="category-tree-card"
       >
         {treeData.length > 0 ? (
           <Tree
@@ -422,9 +428,10 @@ export const CategoryManagement: React.FC = () => {
             onSelect={onSelect}
             treeData={treeData}
             className="category-tree"
+            data-testid="category-tree"
           />
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500" data-testid="empty-categories">
             暂无分类数据，点击"新建分类"开始创建
           </div>
         )}
@@ -440,11 +447,13 @@ export const CategoryManagement: React.FC = () => {
         }}
         onOk={() => form.submit()}
         width={600}
+        data-testid="category-modal"
       >
         <Form
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
+          data-testid="category-form"
         >
           <Form.Item
             name="name"
@@ -454,7 +463,7 @@ export const CategoryManagement: React.FC = () => {
               { max: 100, message: '分类名称不能超过100个字符' },
             ]}
           >
-            <Input placeholder="请输入分类名称" />
+            <Input placeholder="请输入分类名称" data-testid="category-name-input" />
           </Form.Item>
 
           <Form.Item
@@ -467,6 +476,7 @@ export const CategoryManagement: React.FC = () => {
             <TextArea
               rows={3}
               placeholder="请输入分类描述（可选）"
+              data-testid="category-description-input"
             />
           </Form.Item>
 
@@ -477,6 +487,7 @@ export const CategoryManagement: React.FC = () => {
             <Select
               placeholder="请选择父分类（可选）"
               allowClear
+              data-testid="parent-category-select"
             >
               {getParentOptions(categories, editingCategory?.id).map(cat => (
                 <Option key={cat.id} value={cat.id}>
@@ -495,6 +506,7 @@ export const CategoryManagement: React.FC = () => {
               <Switch
                 checkedChildren="启用"
                 unCheckedChildren="禁用"
+                data-testid="category-status-switch"
               />
             </Form.Item>
           )}

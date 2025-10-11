@@ -1,210 +1,194 @@
-version: '3.8'
-
+networks:
+  knowledge-base-network:
+    driver: bridge
 services:
-  # NebulaGraph图数据库
-  nebula-graph:
-    image: vesoft/nebula-graphd:v3.8.0
-    container_name: knowledge-base-nebula-graph
-    ports:
-      - "9669:9669"
-      - "19669:19669"
-      - "19670:19670"
-    volumes:
-      - nebula_data:/data
-      - nebula_logs:/logs
-    networks:
-      - knowledge-base-network
-    environment:
-      - TZ=Asia/Shanghai
-    restart: unless-stopped
-
-  # NebulaGraph存储服务
-  nebula-storaged:
-    image: vesoft/nebula-storaged:v3.8.0
-    container_name: knowledge-base-nebula-storaged
-    ports:
-      - "9779:9779"
-      - "19779:19779"
-      - "19780:19780"
-    volumes:
-      - nebula_storaged_data:/data
-      - nebula_storaged_logs:/logs
-    networks:
-      - knowledge-base-network
-    depends_on:
-      - nebula-graph
-    environment:
-      - TZ=Asia/Shanghai
-    restart: unless-stopped
-
-  # NebulaGraph元数据服务
-  nebula-metad:
-    image: vesoft/nebula-metad:v3.8.0
-    container_name: knowledge-base-nebula-metad
-    ports:
-      - "9559:9559"
-      - "19559:19559"
-      - "19560:19560"
-    volumes:
-      - nebula_metad_data:/data
-      - nebula_metad_logs:/logs
-    networks:
-      - knowledge-base-network
-    environment:
-      - TZ=Asia/Shanghai
-    restart: unless-stopped
-
-  # PostgreSQL数据库
-  postgres:
-    image: postgres:15-alpine
-    container_name: knowledge-base-postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - knowledge-base-network
-    environment:
-      - POSTGRES_DB=knowledge_base
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=123456
-      - TZ=Asia/Shanghai
-    restart: unless-stopped
-
-  # Redis缓存服务
-  redis:
-    image: redis:7-alpine
-    container_name: knowledge-base-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - knowledge-base-network
-    restart: unless-stopped
-
-  # 后端API服务
   backend:
     build:
       context: ./src/backend
-      dockerfile: Dockerfile
+    command: sh -c "sleep 15 && gunicorn --bind 0.0.0.0:5000 --workers 4 'app:create_app()'"
     container_name: knowledge-base-backend
-    ports:
-      - "5000:8000"
-    volumes:
-      - ./src/backend:/app
-      - ./logs:/app/logs
-    networks:
-      - knowledge-base-network
     depends_on:
-      - postgres
-      - redis
-      - nebula-graph
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
+      nebula-graph:
+        condition: service_started
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
     environment:
-      - FLASK_ENV=development
-      - DATABASE_URL=postgresql://admin:123456@postgres:5432/knowledge_base
-      - REDIS_URL=redis://redis:6379/0
-      - NEBULA_GRAPH_HOST=nebula-graph
-      - NEBULA_GRAPH_PORT=9669
-      - ELASTICSEARCH_HOST=elasticsearch
-      - ELASTICSEARCH_PORT=9200
-      - TZ=Asia/Shanghai
-    restart: unless-stopped
-
-  # 前端服务
+      DATABASE_URL: postgresql://admin:123456@postgres:5432/knowledge_base
+      ELASTICSEARCH_HOST: elasticsearch
+      ELASTICSEARCH_PORT: '9200'
+      FLASK_APP: app
+      FLASK_ENV: development
+      NEBULA_GRAPH_HOST: nebula-graph
+      NEBULA_GRAPH_PORT: '9669'
+      NEO4J_PASSWORD: nebula
+      NEO4J_URI: bolt://nebula-graph:9669
+      NEO4J_USERNAME: root
+      POSTGRES_DB: knowledge_base
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      REDIS_URL: redis://redis:6379/0
+      TZ: Asia/Shanghai
+    networks:
+    - knowledge-base-network
+    ports:
+    - 5000:5000
+    restart: always
+    volumes:
+    - ./src/backend:/app
+    - ./logs:/app/logs
+  elasticsearch:
+    container_name: knowledge-base-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: 'false'
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    networks:
+    - knowledge-base-network
+    ports:
+    - 9200:9200
+    - 9300:9300
+    volumes:
+    - elasticsearch_data:/usr/share/elasticsearch/data
   frontend:
     build:
       context: ./src/frontend
       dockerfile: Dockerfile
     container_name: knowledge-base-frontend
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./src/frontend:/app
-      - /app/node_modules
-    networks:
-      - knowledge-base-network
     depends_on:
-      - backend
+    - backend
     environment:
-      - NODE_ENV=development
-      - REACT_APP_API_URL=http://localhost:5000
-      - TZ=Asia/Shanghai
-    restart: unless-stopped
-
-  # Prometheus监控
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: knowledge-base-prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
+      NODE_ENV: development
+      REACT_APP_API_URL: http://localhost:5000
+      TZ: Asia/Shanghai
     networks:
-      - knowledge-base-network
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
+    - knowledge-base-network
+    ports:
+    - 3000:3000
     restart: unless-stopped
-
-  # Grafana可视化
+    volumes:
+    - ./src/frontend:/app
+    - /app/node_modules
   grafana:
-    image: grafana/grafana:latest
     container_name: knowledge-base-grafana
-    ports:
-      - "3001:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./config/grafana:/etc/grafana/provisioning
-    networks:
-      - knowledge-base-network
     depends_on:
-      - prometheus
+    - prometheus
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_USERS_ALLOW_SIGN_UP=false
-    restart: unless-stopped
-
-  # Elasticsearch全文搜索引擎
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-    container_name: knowledge-base-elasticsearch
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+    image: grafana/grafana:latest
     networks:
-      - knowledge-base-network
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - TZ=Asia/Shanghai
+    - knowledge-base-network
+    ports:
+    - 3001:3000
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
+    volumes:
+    - grafana_data:/var/lib/grafana
+    - ./config/grafana:/etc/grafana/provisioning
+  nebula-graph:
+    container_name: knowledge-base-nebula-graph
+    environment:
+      TZ: Asia/Shanghai
+    image: vesoft/nebula-graphd:v3.8.0
+    networks:
+    - knowledge-base-network
+    ports:
+    - 9669:9669
+    restart: unless-stopped
+    volumes:
+    - nebula_data:/data
+    - nebula_logs:/logs
+  nebula-metad:
+    container_name: knowledge-base-nebula-metad
+    environment:
+      TZ: Asia/Shanghai
+    image: vesoft/nebula-metad:v3.8.0
+    networks:
+    - knowledge-base-network
+    ports:
+    - 9559:9559
+    restart: unless-stopped
+    volumes:
+    - nebula_metad_data:/data
+    - nebula_metad_logs:/logs
+  nebula-storaged:
+    container_name: knowledge-base-nebula-storaged
+    depends_on:
+    - nebula-graph
+    environment:
+      TZ: Asia/Shanghai
+    image: vesoft/nebula-storaged:v3.8.0
+    networks:
+    - knowledge-base-network
+    ports:
+    - 9779:9779
+    restart: unless-stopped
+    volumes:
+    - nebula_storaged_data:/data
+    - nebula_storaged_logs:/logs
+  postgres:
+    container_name: knowledge-base-postgres
+    environment:
+      POSTGRES_DB: knowledge_base
+      POSTGRES_PASSWORD: '123456'
+      POSTGRES_USER: admin
+      TZ: Asia/Shanghai
+    image: postgres:15-alpine
+    networks:
+    - knowledge-base-network
+    ports:
+    - 5432:5432
+    restart: unless-stopped
+    volumes:
+    - postgres_data:/var/lib/postgresql/data
+  prometheus:
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    - --storage.tsdb.path=/prometheus
+    - --web.console.libraries=/etc/prometheus/console_libraries
+    - --web.console.templates=/etc/prometheus/consoles
+    container_name: knowledge-base-prometheus
+    image: prom/prometheus:latest
+    networks:
+    - knowledge-base-network
+    ports:
+    - 9090:9090
+    restart: unless-stopped
+    volumes:
+    - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+    - prometheus_data:/prometheus
+  redis:
+    container_name: knowledge-base-redis
+    image: redis:7-alpine
+    networks:
+    - knowledge-base-network
+    ports:
+    - 6379:6379
+    restart: unless-stopped
+    volumes:
+    - redis_data:/data
+version: '3.8'
 volumes:
-  postgres_data:
-  nebula_data:
-  nebula_logs:
-  nebula_storaged_data:
-  nebula_storaged_logs:
-  nebula_metad_data:
-  nebula_metad_logs:
-  redis_data:
-  prometheus_data:
-  grafana_data:
-  elasticsearch_data:
-
-networks:
-  knowledge-base-network:
-    driver: bridge
+  elasticsearch_data: {}
+  grafana_data: {}
+  nebula_data: {}
+  nebula_logs: {}
+  nebula_metad_data: {}
+  nebula_metad_logs: {}
+  nebula_storaged_data: {}
+  nebula_storaged_logs: {}
+  postgres_data: {}
+  prometheus_data: {}
+  redis_data: {}

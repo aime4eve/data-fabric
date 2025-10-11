@@ -1,6 +1,7 @@
 """
 文档仓储实现
 """
+import uuid
 from typing import List, Optional
 from datetime import datetime
 
@@ -15,15 +16,16 @@ class DocumentRepositoryImpl(DocumentRepository):
     
     def save(self, document: Document) -> Document:
         """保存文档"""
+        doc_id_uuid = uuid.UUID(document.id)
         # 检查是否已存在
-        existing_model = DocumentModel.query.filter_by(id=document.id).first()
+        existing_model = DocumentModel.query.filter_by(id=doc_id_uuid).first()
         
         if existing_model:
             # 更新现有文档
             existing_model.title = document.title
             existing_model.content_path = document.content_path
-            existing_model.category_id = document.category_id
-            existing_model.author_id = document.author_id
+            existing_model.category_id = uuid.UUID(document.category_id)
+            existing_model.author_id = uuid.UUID(document.author_id)
             existing_model.status = document.status.value
             existing_model.doc_metadata = document.metadata
             existing_model.updated_at = document.updated_at
@@ -31,11 +33,11 @@ class DocumentRepositoryImpl(DocumentRepository):
         else:
             # 创建新文档
             model = DocumentModel(
-                id=document.id,
+                id=doc_id_uuid,
                 title=document.title,
                 content_path=document.content_path,
-                category_id=document.category_id,
-                author_id=document.author_id,
+                category_id=uuid.UUID(document.category_id),
+                author_id=uuid.UUID(document.author_id),
                 status=document.status.value,
                 doc_metadata=document.metadata,
                 created_at=document.created_at,
@@ -48,7 +50,7 @@ class DocumentRepositoryImpl(DocumentRepository):
     
     def find_by_id(self, document_id: str) -> Optional[Document]:
         """根据ID查找文档"""
-        model = DocumentModel.query.filter_by(id=document_id).first()
+        model = DocumentModel.query.filter_by(id=uuid.UUID(document_id)).first()
         return self._model_to_entity(model) if model else None
     
     def find_by_category_id(self, category_id: str) -> List[Document]:
@@ -58,7 +60,8 @@ class DocumentRepositoryImpl(DocumentRepository):
     
     def find_by_author_id(self, author_id: str) -> List[Document]:
         """根据作者ID查找文档"""
-        models = DocumentModel.query.filter_by(author_id=author_id).all()
+        import uuid
+        models = DocumentModel.query.filter_by(author_id=uuid.UUID(author_id)).all()
         return [self._model_to_entity(model) for model in models]
     
     def find_by_status(self, status: DocumentStatus) -> List[Document]:
@@ -114,6 +117,15 @@ class DocumentRepositoryImpl(DocumentRepository):
                 (DocumentModel.content_summary.contains(query))
             )
             search_conditions.append(summary_condition)
+            
+            # 路径搜索（只有当字段不为空时才搜索）
+            path_condition = (
+                (DocumentModel.content_path.isnot(None)) & 
+                (DocumentModel.content_path != '') &
+                (DocumentModel.content_path.contains(query))
+            )
+            search_conditions.append(path_condition)
+            
             base_query = base_query.filter(or_(*search_conditions))
         
         # 添加过滤条件
@@ -123,18 +135,23 @@ class DocumentRepositoryImpl(DocumentRepository):
             base_query = base_query.filter(DocumentModel.author_id == author_id)
         if status:
             base_query = base_query.filter(DocumentModel.status == status.value)
-        else:
-            # 默认只搜索已发布的文档
-            base_query = base_query.filter(DocumentModel.status == 'published')
+        # 注释掉默认只搜索已发布文档的限制，允许搜索所有状态的文档
+        # else:
+        #     # 默认只搜索已发布的文档
+        #     base_query = base_query.filter(DocumentModel.status == 'published')
         
         # 分页查询
-        try:
-            models = base_query.paginate(
-                page=page, per_page=size, error_out=False
-            ).items
-        except Exception as e:
-            # 如果分页失败，直接查询所有结果
+        if page is None or size is None:
+            # 不分页，返回所有结果
             models = base_query.all()
+        else:
+            try:
+                models = base_query.paginate(
+                    page=page, per_page=size, error_out=False
+                ).items
+            except Exception as e:
+                # 如果分页失败，直接查询所有结果
+                models = base_query.all()
         
         return [self._model_to_entity(model) for model in models]
     
@@ -173,7 +190,43 @@ class DocumentRepositoryImpl(DocumentRepository):
     
     def count_by_author(self, author_id: str) -> int:
         """统计作者的文档数量"""
-        return DocumentModel.query.filter_by(author_id=author_id).count()
+        import uuid
+        return DocumentModel.query.filter_by(author_id=uuid.UUID(author_id)).count()
+    
+    def count_by_status(self, status: DocumentStatus = None) -> int:
+        """统计指定状态的文档数量"""
+        query = DocumentModel.query
+        if status:
+            # 处理字符串和枚举两种类型的status参数
+            if isinstance(status, str):
+                query = query.filter_by(status=status)
+            else:
+                query = query.filter_by(status=status.value)
+        return query.count()
+    
+    def get_document_statistics(self) -> dict:
+        """获取文档统计信息"""
+        from sqlalchemy import func
+        
+        # 使用SQLAlchemy的聚合查询来高效统计不同状态的文档数量
+        result = db.session.query(
+            DocumentModel.status,
+            func.count(DocumentModel.id).label('count')
+        ).group_by(DocumentModel.status).all()
+        
+        # 将结果转换为字典
+        status_counts = {status: count for status, count in result}
+        
+        # 计算总数
+        total_count = sum(status_counts.values())
+        
+        return {
+            'total_documents': total_count,
+            'published_documents': status_counts.get('published', 0),
+            'draft_documents': status_counts.get('draft', 0),
+            'archived_documents': status_counts.get('archived', 0),
+            'deleted_documents': status_counts.get('deleted', 0)
+        }
     
     def _model_to_entity(self, model: DocumentModel) -> Document:
         """将模型转换为实体"""
@@ -185,13 +238,12 @@ class DocumentRepositoryImpl(DocumentRepository):
             metadata['has_summary'] = True
             
         return Document(
-            id=str(model.id),
+            id=model.id,
             title=model.title,
             content_path=model.content_path,
-            category_id=str(model.category_id),
-            author_id=str(model.author_id),
+            category_id=model.category_id,
+            author_id=model.author_id,
             status=DocumentStatus(model.status),
-            metadata=metadata,
             created_at=model.created_at,
             updated_at=model.updated_at
         )

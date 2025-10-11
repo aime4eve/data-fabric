@@ -1,30 +1,65 @@
 import '@testing-library/jest-dom';
 
-// Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+// Mock window.URL.createObjectURL for file download tests
+Object.defineProperty(window, 'URL', {
+  value: {
+    createObjectURL: jest.fn(() => 'mocked-url'),
+    revokeObjectURL: jest.fn(),
+  },
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(), // deprecated
-    removeListener: jest.fn(), // deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
 });
 
-// Mock ResizeObserver
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
+// Mock URL constructor for axios
+(globalThis as any).URL = class MockURL {
+  constructor(url: string, base?: string) {
+    if (base) {
+      this.href = url.startsWith('http') ? url : base + url;
+    } else {
+      this.href = url;
+    }
+    this.protocol = 'http:';
+    this.host = 'localhost:8000';
+    this.hostname = 'localhost';
+    this.port = '8000';
+    this.pathname = '/';
+    this.search = '';
+    this.hash = '';
+  }
+  href: string;
+  protocol: string;
+  host: string;
+  hostname: string;
+  port: string;
+  pathname: string;
+  search: string;
+  hash: string;
+};
 
-// Mock IntersectionObserver
-global.IntersectionObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
+// Mock document.createElement for download tests
+const mockLink = {
+  href: '',
+  download: '',
+  click: jest.fn(),
+};
+
+const originalCreateElement = document.createElement;
+document.createElement = jest.fn((tagName) => {
+  if (tagName === 'a') {
+    return mockLink as any;
+  }
+  return originalCreateElement.call(document, tagName);
+});
+
+// Mock document.body methods
+document.body.appendChild = jest.fn();
+document.body.removeChild = jest.fn();
+
+// Mock fetch for API calls
+(globalThis as any).fetch = jest.fn();
+
+// Mock console methods to avoid noise in tests
+(globalThis as any).console = {
+  ...console,
+  warn: jest.fn(),
+  error: jest.fn(),
+};

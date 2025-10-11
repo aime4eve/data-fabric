@@ -1,0 +1,616 @@
+{
+  "test_execution_summary": {
+    "start_time": "2025-10-06T23:21:05.349290",
+    "end_time": "2025-10-06T23:21:08.098960",
+    "total_duration_seconds": 2.74967,
+    "total_test_cases": 31,
+    "passed": 27,
+    "failed": 4,
+    "skipped": 0,
+    "errors": 0,
+    "success_rate": 87.09677419354838
+  },
+  "test_cases": [
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_success_with_username",
+      "description": "测试使用用户名成功认证",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_success_with_username",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:05.349644",
+      "end_time": "2025-10-06T23:21:05.527151",
+      "duration": 0.1774914264678955,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_success_with_email",
+      "description": "测试使用邮箱成功认证",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_success_with_email",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:05.528035",
+      "end_time": "2025-10-06T23:21:05.708129",
+      "duration": 0.18007993698120117,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_user_not_found",
+      "description": "测试用户不存在的情况",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_user_not_found",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:05.709277",
+      "end_time": "2025-10-06T23:21:05.710148",
+      "duration": 0.0008592605590820312,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_wrong_password",
+      "description": "测试密码错误的情况",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_wrong_password",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:05.710880",
+      "end_time": "2025-10-06T23:21:05.893352",
+      "duration": 0.18246126174926758,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_empty_credentials",
+      "description": "测试空凭据的情况",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_empty_credentials",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:05.894268",
+      "end_time": "2025-10-06T23:21:05.894940",
+      "duration": 0.0006601810455322266,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_sql_injection_attempt",
+      "description": "测试SQL注入尝试",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_sql_injection_attempt",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:05.895649",
+      "end_time": "2025-10-06T23:21:05.896423",
+      "duration": 0.0007646083831787109,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_special_characters",
+      "description": "测试特殊字符处理",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_special_characters",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:05.897091",
+      "end_time": "2025-10-06T23:21:06.156777",
+      "duration": 0.2596757411956787,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_success",
+      "description": "测试成功注册",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_success",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.157584",
+      "end_time": "2025-10-06T23:21:06.202162",
+      "duration": 0.04456520080566406,
+      "status": "failed",
+      "error_message": "self = <test_auth_service.TestAuthService.TestRegister object at 0x72c0e6444290>\nauth_service = <application.services.auth_service.AuthService object at 0x72c0e5ca6fc0>\nmock_user_repository = <Mock id='126172814537072'>\n\n    def test_register_success(self, auth_service, mock_user_repository):\n        \"\"\"测试成功注册\"\"\"\n        # Arrange\n        mock_user_repository.exists_by_username.return_value = False\n        mock_user_repository.exists_by_email.return_value = False\n    \n        # Create a mock user to return from save\n        mock_saved_user = Mock()\n        mock_saved_user.username = \"newuser\"\n        mock_saved_user.email = \"newuser@test.com\"\n        mock_saved_user.role = \"user\"\n        mock_user_repository.save.return_value = mock_saved_user\n    \n        # Act\n>       result = auth_service.register(\"newuser\", \"newuser@test.com\", \"123456\")\n\n../../tests/unit/backend/test_auth_service.py:173: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <application.services.auth_service.AuthService object at 0x72c0e5ca6fc0>\nusername = 'newuser', email = 'newuser@test.com', password = '123456'\nrole = 'user'\n\n    def register(self, username: str, email: str, password: str, role: str = 'user') -> User:\n        \"\"\"用户注册\"\"\"\n        # 输入验证\n        if not username or not email or not password:\n            raise AuthenticationError(\"用户名、邮箱和密码不能为空\")\n    \n        if not username.strip() or not email.strip() or not password.strip():\n            raise AuthenticationError(\"用户名、邮箱和密码不能为空\")\n    \n        # 邮箱格式验证\n        import re\n        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'\n        if not re.match(email_pattern, email):\n            raise AuthenticationError(\"邮箱格式不正确\")\n    \n        # 密码强度验证\n        if len(password) < 6:\n            raise AuthenticationError(\"密码长度至少6位\")\n    \n        # 检查是否为常见弱密码\n        weak_passwords = [\"password\", \"123456\", \"12345678\", \"qwerty\", \"abc123\"]\n        if password.lower() in weak_passwords:\n>           raise AuthenticationError(\"密码过于简单，请使用更复杂的密码\")\nE           shared_kernel.exceptions.auth_exceptions.AuthenticationError: 密码过于简单，请使用更复杂的密码\n\napplication/services/auth_service.py:83: AuthenticationError",
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试失败: self = <test_auth_service.TestAuthService.TestRegister object at 0x72c0e6444290>\nauth_service = <application.services.auth_service.AuthService object at 0x72c0e5ca6fc0>\nmock_user_repository = <Mock id='126172814537072'>\n\n    def test_register_success(self, auth_service, mock_user_repository):\n        \"\"\"测试成功注册\"\"\"\n        # Arrange\n        mock_user_repository.exists_by_username.return_value = False\n        mock_user_repository.exists_by_email.return_value = False\n    \n        # Create a mock user to return from save\n        mock_saved_user = Mock()\n        mock_saved_user.username = \"newuser\"\n        mock_saved_user.email = \"newuser@test.com\"\n        mock_saved_user.role = \"user\"\n        mock_user_repository.save.return_value = mock_saved_user\n    \n        # Act\n>       result = auth_service.register(\"newuser\", \"newuser@test.com\", \"123456\")\n\n../../tests/unit/backend/test_auth_service.py:173: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <application.services.auth_service.AuthService object at 0x72c0e5ca6fc0>\nusername = 'newuser', email = 'newuser@test.com', password = '123456'\nrole = 'user'\n\n    def register(self, username: str, email: str, password: str, role: str = 'user') -> User:\n        \"\"\"用户注册\"\"\"\n        # 输入验证\n        if not username or not email or not password:\n            raise AuthenticationError(\"用户名、邮箱和密码不能为空\")\n    \n        if not username.strip() or not email.strip() or not password.strip():\n            raise AuthenticationError(\"用户名、邮箱和密码不能为空\")\n    \n        # 邮箱格式验证\n        import re\n        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'\n        if not re.match(email_pattern, email):\n            raise AuthenticationError(\"邮箱格式不正确\")\n    \n        # 密码强度验证\n        if len(password) < 6:\n            raise AuthenticationError(\"密码长度至少6位\")\n    \n        # 检查是否为常见弱密码\n        weak_passwords = [\"password\", \"123456\", \"12345678\", \"qwerty\", \"abc123\"]\n        if password.lower() in weak_passwords:\n>           raise AuthenticationError(\"密码过于简单，请使用更复杂的密码\")\nE           shared_kernel.exceptions.auth_exceptions.AuthenticationError: 密码过于简单，请使用更复杂的密码\n\napplication/services/auth_service.py:83: AuthenticationError"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_username_exists",
+      "description": "测试用户名已存在",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_username_exists",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.203800",
+      "end_time": "2025-10-06T23:21:06.209933",
+      "duration": 0.0061151981353759766,
+      "status": "failed",
+      "error_message": "self = <test_auth_service.TestAuthService.TestRegister object at 0x72c0e5c81a30>\nauth_service = <application.services.auth_service.AuthService object at 0x72c0e5ca6780>\nmock_user_repository = <Mock id='126172814533664'>\n\n    def test_register_username_exists(self, auth_service, mock_user_repository):\n        \"\"\"测试用户名已存在\"\"\"\n        # Arrange\n        mock_user_repository.exists_by_username.return_value = True\n    \n        # Act & Assert\n        with pytest.raises(AuthenticationError) as exc_info:\n            auth_service.register(\"existinguser\", \"new@test.com\", \"123456\")\n    \n>       assert str(exc_info.value) == \"用户名已存在\"\nE       AssertionError: assert '密码过于简单，请使用更复杂的密码' == '用户名已存在'\nE         - 用户名已存在\nE         + 密码过于简单，请使用更复杂的密码\n\n../../tests/unit/backend/test_auth_service.py:190: AssertionError",
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试失败: self = <test_auth_service.TestAuthService.TestRegister object at 0x72c0e5c81a30>\nauth_service = <application.services.auth_service.AuthService object at 0x72c0e5ca6780>\nmock_user_repository = <Mock id='126172814533664'>\n\n    def test_register_username_exists(self, auth_service, mock_user_repository):\n        \"\"\"测试用户名已存在\"\"\"\n        # Arrange\n        mock_user_repository.exists_by_username.return_value = True\n    \n        # Act & Assert\n        with pytest.raises(AuthenticationError) as exc_info:\n            auth_service.register(\"existinguser\", \"new@test.com\", \"123456\")\n    \n>       assert str(exc_info.value) == \"用户名已存在\"\nE       AssertionError: assert '密码过于简单，请使用更复杂的密码' == '用户名已存在'\nE         - 用户名已存在\nE         + 密码过于简单，请使用更复杂的密码\n\n../../tests/unit/backend/test_auth_service.py:190: AssertionError"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_email_exists",
+      "description": "测试邮箱已存在",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_email_exists",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.211436",
+      "end_time": "2025-10-06T23:21:06.220292",
+      "duration": 0.0088348388671875,
+      "status": "failed",
+      "error_message": "self = <test_auth_service.TestAuthService.TestRegister object at 0x72c0e5c81d00>\nauth_service = <application.services.auth_service.AuthService object at 0x72c0e5ca61b0>\nmock_user_repository = <Mock id='126172814532992'>\n\n    def test_register_email_exists(self, auth_service, mock_user_repository):\n        \"\"\"测试邮箱已存在\"\"\"\n        # Arrange\n        mock_user_repository.exists_by_username.return_value = False\n        mock_user_repository.exists_by_email.return_value = True\n    \n        # Act & Assert\n        with pytest.raises(AuthenticationError) as exc_info:\n            auth_service.register(\"newuser\", \"existing@test.com\", \"123456\")\n    \n>       assert str(exc_info.value) == \"邮箱已存在\"\nE       AssertionError: assert '密码过于简单，请使用更复杂的密码' == '邮箱已存在'\nE         - 邮箱已存在\nE         + 密码过于简单，请使用更复杂的密码\n\n../../tests/unit/backend/test_auth_service.py:202: AssertionError",
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试失败: self = <test_auth_service.TestAuthService.TestRegister object at 0x72c0e5c81d00>\nauth_service = <application.services.auth_service.AuthService object at 0x72c0e5ca61b0>\nmock_user_repository = <Mock id='126172814532992'>\n\n    def test_register_email_exists(self, auth_service, mock_user_repository):\n        \"\"\"测试邮箱已存在\"\"\"\n        # Arrange\n        mock_user_repository.exists_by_username.return_value = False\n        mock_user_repository.exists_by_email.return_value = True\n    \n        # Act & Assert\n        with pytest.raises(AuthenticationError) as exc_info:\n            auth_service.register(\"newuser\", \"existing@test.com\", \"123456\")\n    \n>       assert str(exc_info.value) == \"邮箱已存在\"\nE       AssertionError: assert '密码过于简单，请使用更复杂的密码' == '邮箱已存在'\nE         - 邮箱已存在\nE         + 密码过于简单，请使用更复杂的密码\n\n../../tests/unit/backend/test_auth_service.py:202: AssertionError"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_invalid_email_format",
+      "description": "测试无效邮箱格式",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_invalid_email_format",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.221508",
+      "end_time": "2025-10-06T23:21:06.222285",
+      "duration": 0.0007648468017578125,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_weak_password",
+      "description": "测试弱密码",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_weak_password",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.223060",
+      "end_time": "2025-10-06T23:21:06.223911",
+      "duration": 0.0008399486541748047,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_admin_role",
+      "description": "测试注册管理员角色",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_admin_role",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.225458",
+      "end_time": "2025-10-06T23:21:06.237665",
+      "duration": 0.012176990509033203,
+      "status": "failed",
+      "error_message": "self = <test_auth_service.TestAuthService.TestRegister object at 0x72c0e5c82570>\nauth_service = <application.services.auth_service.AuthService object at 0x72c0e6446c00>\nmock_user_repository = <Mock id='126172822530832'>\n\n    def test_register_admin_role(self, auth_service, mock_user_repository):\n        \"\"\"测试注册管理员角色\"\"\"\n        # Arrange\n        mock_user_repository.exists_by_username.return_value = False\n        mock_user_repository.exists_by_email.return_value = False\n    \n        # Create a mock user with admin role\n        mock_admin_user = Mock()\n        mock_admin_user.username = \"admin\"\n        mock_admin_user.email = \"admin@test.com\"\n        mock_admin_user.role = \"admin\"\n        mock_user_repository.save.return_value = mock_admin_user\n    \n        # Act\n>       result = auth_service.register(\"admin\", \"admin@test.com\", \"123456\", \"admin\")\n\n../../tests/unit/backend/test_auth_service.py:238: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <application.services.auth_service.AuthService object at 0x72c0e6446c00>\nusername = 'admin', email = 'admin@test.com', password = '123456'\nrole = 'admin'\n\n    def register(self, username: str, email: str, password: str, role: str = 'user') -> User:\n        \"\"\"用户注册\"\"\"\n        # 输入验证\n        if not username or not email or not password:\n            raise AuthenticationError(\"用户名、邮箱和密码不能为空\")\n    \n        if not username.strip() or not email.strip() or not password.strip():\n            raise AuthenticationError(\"用户名、邮箱和密码不能为空\")\n    \n        # 邮箱格式验证\n        import re\n        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'\n        if not re.match(email_pattern, email):\n            raise AuthenticationError(\"邮箱格式不正确\")\n    \n        # 密码强度验证\n        if len(password) < 6:\n            raise AuthenticationError(\"密码长度至少6位\")\n    \n        # 检查是否为常见弱密码\n        weak_passwords = [\"password\", \"123456\", \"12345678\", \"qwerty\", \"abc123\"]\n        if password.lower() in weak_passwords:\n>           raise AuthenticationError(\"密码过于简单，请使用更复杂的密码\")\nE           shared_kernel.exceptions.auth_exceptions.AuthenticationError: 密码过于简单，请使用更复杂的密码\n\napplication/services/auth_service.py:83: AuthenticationError",
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试失败: self = <test_auth_service.TestAuthService.TestRegister object at 0x72c0e5c82570>\nauth_service = <application.services.auth_service.AuthService object at 0x72c0e6446c00>\nmock_user_repository = <Mock id='126172822530832'>\n\n    def test_register_admin_role(self, auth_service, mock_user_repository):\n        \"\"\"测试注册管理员角色\"\"\"\n        # Arrange\n        mock_user_repository.exists_by_username.return_value = False\n        mock_user_repository.exists_by_email.return_value = False\n    \n        # Create a mock user with admin role\n        mock_admin_user = Mock()\n        mock_admin_user.username = \"admin\"\n        mock_admin_user.email = \"admin@test.com\"\n        mock_admin_user.role = \"admin\"\n        mock_user_repository.save.return_value = mock_admin_user\n    \n        # Act\n>       result = auth_service.register(\"admin\", \"admin@test.com\", \"123456\", \"admin\")\n\n../../tests/unit/backend/test_auth_service.py:238: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <application.services.auth_service.AuthService object at 0x72c0e6446c00>\nusername = 'admin', email = 'admin@test.com', password = '123456'\nrole = 'admin'\n\n    def register(self, username: str, email: str, password: str, role: str = 'user') -> User:\n        \"\"\"用户注册\"\"\"\n        # 输入验证\n        if not username or not email or not password:\n            raise AuthenticationError(\"用户名、邮箱和密码不能为空\")\n    \n        if not username.strip() or not email.strip() or not password.strip():\n            raise AuthenticationError(\"用户名、邮箱和密码不能为空\")\n    \n        # 邮箱格式验证\n        import re\n        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'\n        if not re.match(email_pattern, email):\n            raise AuthenticationError(\"邮箱格式不正确\")\n    \n        # 密码强度验证\n        if len(password) < 6:\n            raise AuthenticationError(\"密码长度至少6位\")\n    \n        # 检查是否为常见弱密码\n        weak_passwords = [\"password\", \"123456\", \"12345678\", \"qwerty\", \"abc123\"]\n        if password.lower() in weak_passwords:\n>           raise AuthenticationError(\"密码过于简单，请使用更复杂的密码\")\nE           shared_kernel.exceptions.auth_exceptions.AuthenticationError: 密码过于简单，请使用更复杂的密码\n\napplication/services/auth_service.py:83: AuthenticationError"
+    },
+    {
+      "test_id": "test_auth_service::TestRefreshToken::test_refresh_token_success",
+      "description": "测试成功刷新令牌",
+      "module": "test_auth_service",
+      "class": "TestRefreshToken",
+      "function": "test_refresh_token_success",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.239035",
+      "end_time": "2025-10-06T23:21:06.333166",
+      "duration": 0.09411883354187012,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRefreshToken::test_refresh_token_invalid_token",
+      "description": "测试无效刷新令牌",
+      "module": "test_auth_service",
+      "class": "TestRefreshToken",
+      "function": "test_refresh_token_invalid_token",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.333980",
+      "end_time": "2025-10-06T23:21:06.334738",
+      "duration": 0.0007481575012207031,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRefreshToken::test_refresh_token_user_not_found",
+      "description": "测试用户不存在",
+      "module": "test_auth_service",
+      "class": "TestRefreshToken",
+      "function": "test_refresh_token_user_not_found",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.335418",
+      "end_time": "2025-10-06T23:21:06.336373",
+      "duration": 0.0009472370147705078,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestChangePassword::test_change_password_success",
+      "description": "测试成功修改密码",
+      "module": "test_auth_service",
+      "class": "TestChangePassword",
+      "function": "test_change_password_success",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.337022",
+      "end_time": "2025-10-06T23:21:06.599276",
+      "duration": 0.26224470138549805,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestChangePassword::test_change_password_user_not_found",
+      "description": "测试用户不存在",
+      "module": "test_auth_service",
+      "class": "TestChangePassword",
+      "function": "test_change_password_user_not_found",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.600371",
+      "end_time": "2025-10-06T23:21:06.601159",
+      "duration": 0.0007760524749755859,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestChangePassword::test_change_password_wrong_old_password",
+      "description": "测试旧密码错误",
+      "module": "test_auth_service",
+      "class": "TestChangePassword",
+      "function": "test_change_password_wrong_old_password",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.602035",
+      "end_time": "2025-10-06T23:21:06.777205",
+      "duration": 0.17515921592712402,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestChangePassword::test_change_password_same_as_old",
+      "description": "测试新密码与旧密码相同",
+      "module": "test_auth_service",
+      "class": "TestChangePassword",
+      "function": "test_change_password_same_as_old",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.778073",
+      "end_time": "2025-10-06T23:21:06.947854",
+      "duration": 0.1697695255279541,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestResetPassword::test_reset_password_success",
+      "description": "测试成功重置密码",
+      "module": "test_auth_service",
+      "class": "TestResetPassword",
+      "function": "test_reset_password_success",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:06.948735",
+      "end_time": "2025-10-06T23:21:07.117959",
+      "duration": 0.16921210289001465,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestResetPassword::test_reset_password_user_not_found",
+      "description": "测试用户不存在",
+      "module": "test_auth_service",
+      "class": "TestResetPassword",
+      "function": "test_reset_password_user_not_found",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:07.118705",
+      "end_time": "2025-10-06T23:21:07.119499",
+      "duration": 0.0007836818695068359,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestPasswordSecurity::test_password_hashing",
+      "description": "测试密码哈希",
+      "module": "test_auth_service",
+      "class": "TestPasswordSecurity",
+      "function": "test_password_hashing",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:07.120091",
+      "end_time": "2025-10-06T23:21:07.290961",
+      "duration": 0.17086029052734375,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestPasswordSecurity::test_password_verification",
+      "description": "测试密码验证",
+      "module": "test_auth_service",
+      "class": "TestPasswordSecurity",
+      "function": "test_password_verification",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:07.291743",
+      "end_time": "2025-10-06T23:21:07.591635",
+      "duration": 0.2998802661895752,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestPasswordSecurity::test_password_salt_uniqueness",
+      "description": "测试密码盐值唯一性",
+      "module": "test_auth_service",
+      "class": "TestPasswordSecurity",
+      "function": "test_password_salt_uniqueness",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:07.592563",
+      "end_time": "2025-10-06T23:21:07.925430",
+      "duration": 0.3328542709350586,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestInputValidation::test_validate_empty_inputs",
+      "description": "测试空输入验证",
+      "module": "test_auth_service",
+      "class": "TestInputValidation",
+      "function": "test_validate_empty_inputs",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:07.926343",
+      "end_time": "2025-10-06T23:21:07.926978",
+      "duration": 0.0006241798400878906,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestInputValidation::test_validate_none_inputs",
+      "description": "测试None输入验证",
+      "module": "test_auth_service",
+      "class": "TestInputValidation",
+      "function": "test_validate_none_inputs",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:07.927712",
+      "end_time": "2025-10-06T23:21:07.928316",
+      "duration": 0.0005958080291748047,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestInputValidation::test_validate_whitespace_inputs",
+      "description": "测试空白字符输入验证",
+      "module": "test_auth_service",
+      "class": "TestInputValidation",
+      "function": "test_validate_whitespace_inputs",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:21:07.928979",
+      "end_time": "2025-10-06T23:21:07.929544",
+      "duration": 0.0005578994750976562,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestSecurityFeatures::test_timing_attack_resistance",
+      "description": "测试时序攻击防护",
+      "module": "test_auth_service",
+      "class": "TestSecurityFeatures",
+      "function": "test_timing_attack_resistance",
+      "markers": [
+        "security"
+      ],
+      "start_time": "2025-10-06T23:21:07.930159",
+      "end_time": "2025-10-06T23:21:08.095957",
+      "duration": 0.1657881736755371,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestSecurityFeatures::test_password_complexity_validation",
+      "description": "测试密码复杂度验证",
+      "module": "test_auth_service",
+      "class": "TestSecurityFeatures",
+      "function": "test_password_complexity_validation",
+      "markers": [
+        "security"
+      ],
+      "start_time": "2025-10-06T23:21:08.096810",
+      "end_time": "2025-10-06T23:21:08.097555",
+      "duration": 0.0007331371307373047,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestSecurityFeatures::test_xss_prevention_in_error_messages",
+      "description": "测试错误消息中的XSS防护",
+      "module": "test_auth_service",
+      "class": "TestSecurityFeatures",
+      "function": "test_xss_prevention_in_error_messages",
+      "markers": [
+        "security"
+      ],
+      "start_time": "2025-10-06T23:21:08.098263",
+      "end_time": "2025-10-06T23:21:08.098916",
+      "duration": 0.0006449222564697266,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    }
+  ],
+  "environment_info": {
+    "python_version": "3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]",
+    "pytest_version": "7.4.4",
+    "operating_system": "posix",
+    "frontend_url": "http://localhost:3000",
+    "backend_url": "http://localhost:5000"
+  },
+  "compliance_info": {
+    "security_standards": "符合政府安全标准要求",
+    "automation_framework": "适用于自动化测试框架",
+    "manual_intervention": "最小化人工干预"
+  }
+}

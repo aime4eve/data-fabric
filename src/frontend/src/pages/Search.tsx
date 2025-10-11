@@ -63,32 +63,31 @@ export const SearchPage: React.FC = () => {
 
   // 初始化数据
   useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const loadInitialData = async () => {
-    try {
-      // 加载分类和统计信息
-      const [categoriesRes, statsRes] = await Promise.all([
-        SearchService.getSearchCategories(),
-        SearchService.getSearchStats()
-      ]);
-
-      if (categoriesRes.success) {
-        setCategories(categoriesRes.data.categories);
-        setFileExtensions(categoriesRes.data.file_extensions);
+    const loadCategories = async () => {
+      try {
+        const response = await SearchService.getSearchCategories();
+        setCategories(response.categories);
+        setFileExtensions(response.file_extensions);
+      } catch (error) {
+        console.error('加载分类失败:', error);
       }
+    };
 
-      if (statsRes.success) {
+    const loadStats = async () => {
+      try {
+        const response = await SearchService.getSearchStats();
         setSearchStats({
-          total_documents: statsRes.data.total_documents,
-          index_size: statsRes.data.index_size
+          total_documents: response.total_documents,
+          index_size: response.index_size
         });
+      } catch (error) {
+        console.error('加载统计信息失败:', error);
       }
-    } catch (error) {
-      console.error('加载初始数据失败:', error);
-    }
-  };
+    };
+
+    loadCategories();
+    loadStats();
+  }, []);
 
   const handleSearch = async (query?: string, page: number = 1) => {
     const searchQuery = query || searchText;
@@ -112,13 +111,11 @@ export const SearchPage: React.FC = () => {
       };
 
       const response = await SearchService.searchDocuments(searchParams);
-      if (response.success) {
-        setSearchResults(response.data.results);
-        setTotalResults(response.data.total);
-        setCurrentPage(response.data.page);
-        setTotalPages(response.data.total_pages);
-        setSearchTime(response.data.took);
-      }
+      setSearchResults(response.results);
+      setTotalResults(response.total);
+      setCurrentPage(response.page);
+      setTotalPages(response.total_pages);
+      setSearchTime(response.took);
     } catch (error) {
       console.error('搜索失败:', error);
       // 避免循环引用错误，只记录错误消息
@@ -135,9 +132,7 @@ export const SearchPage: React.FC = () => {
     if (value.length >= 2) {
       try {
         const response = await SearchService.getSearchSuggestions(value);
-        if (response.success) {
-          setSearchSuggestions(response.data.suggestions.map(s => s.text));
-        }
+        setSearchSuggestions(response.map(s => s.text));
       } catch (error) {
         console.error('获取搜索建议失败:', error);
       }
@@ -177,7 +172,12 @@ export const SearchPage: React.FC = () => {
       const response = await SearchService.reindexDocuments();
       if (response.success) {
         message.success('重新索引成功');
-        await loadInitialData(); // 重新加载统计信息
+        // 重新加载统计信息
+        const statsRes = await SearchService.getSearchStats();
+        setSearchStats({
+          total_documents: statsRes.total_documents,
+          index_size: statsRes.index_size
+        });
       }
     } catch (error) {
       console.error('重新索引失败:', error);
@@ -381,7 +381,8 @@ export const SearchPage: React.FC = () => {
                     <Button
                       type="link"
                       key="view"
-                      onClick={() => window.open(result.file_path, '_blank')}
+                      onClick={() => handleFilePreview(result.file_path)}
+                      data-testid={`view-file-${result.id}`}
                     >
                       查看文件
                     </Button>,
@@ -481,3 +482,18 @@ export const SearchPage: React.FC = () => {
     </div>
   );
 };
+
+
+  const handleFilePreview = (filePath: string) => {
+    try {
+      // 构建预览URL - 使用 Vite 环境变量
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+      const previewUrl = `${baseUrl}/documents/file-preview?path=${encodeURIComponent(filePath)}`;
+      
+      // 在新窗口中打开文件预览
+      window.open(previewUrl, '_blank');
+    } catch (error) {
+      console.error('文件预览失败:', error);
+      message.error('文件预览失败，请稍后重试');
+    }
+  };

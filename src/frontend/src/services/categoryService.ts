@@ -45,7 +45,7 @@ export interface CategoryTreeResponse {
 
 export class CategoryService {
   /**
-   * 获取分类列表（平铺结构）
+   * 获取分类列表
    */
   static async getCategories(params?: {
     page?: number;
@@ -54,16 +54,18 @@ export class CategoryService {
     search?: string;
     is_active?: boolean;
   }): Promise<CategoryListResponse> {
-    const response = await api.get('/categories/', { params });
-    return response.data;
+    const response = await api.get<CategoryListResponse>('/categories/', { params });
+    // 后端返回的数据结构直接包含data字段
+    return (response.data as any).data || response.data;
   }
 
   /**
-   * 获取分类树形结构
+   * 获取分类树
    */
   static async getCategoryTree(): Promise<CategoryTreeResponse> {
-    const response = await api.get('/categories/tree/');
-    return response.data;
+    const response = await api.get<Category[]>('/categories/tree/');
+    // 后端直接返回数组，不是包装在data字段中
+    return { data: (response.data as any).data || response.data };
   }
 
   /**
@@ -71,7 +73,7 @@ export class CategoryService {
    */
   static async getCategory(id: string): Promise<Category> {
     const response = await api.get(`/categories/${id}/`);
-    return response.data;
+    return response.data.data;
   }
 
   /**
@@ -79,7 +81,7 @@ export class CategoryService {
    */
   static async createCategory(data: CreateCategoryRequest): Promise<Category> {
     const response = await api.post('/categories/', data);
-    return response.data;
+    return response.data.data;
   }
 
   /**
@@ -87,7 +89,7 @@ export class CategoryService {
    */
   static async updateCategory(id: string, data: UpdateCategoryRequest): Promise<Category> {
     const response = await api.put(`/categories/${id}/`, data);
-    return response.data;
+    return response.data.data;
   }
 
   /**
@@ -105,14 +107,14 @@ export class CategoryService {
   }
 
   /**
-   * 移动分类（更改父级分类）
+   * 移动分类
    */
   static async moveCategory(id: string, parent_id?: string, sort_order?: number): Promise<Category> {
-    const response = await api.post(`/categories/${id}/move/`, {
+    const response = await api.patch(`/categories/${id}/move/`, {
       parent_id,
       sort_order,
     });
-    return response.data;
+    return response.data.data;
   }
 
   /**
@@ -123,7 +125,7 @@ export class CategoryService {
   }
 
   /**
-   * 获取分类的文档数量统计
+   * 获取分类统计信息
    */
   static async getCategoryStats(id: string): Promise<{
     document_count: number;
@@ -131,14 +133,14 @@ export class CategoryService {
     total_document_count: number;
   }> {
     const response = await api.get(`/categories/${id}/stats/`);
-    return response.data;
+    return response.data.data;
   }
 
   /**
-   * 启用/禁用分类
+   * 切换分类状态
    */
   static async toggleCategoryStatus(id: string, is_active: boolean): Promise<Category> {
-    const response = await api.post(`/categories/${id}/toggle-status/`, { is_active });
-    return response.data;
+    const response = await api.patch(`/categories/${id}/status/`, { is_active });
+    return response.data.data;
   }
 }

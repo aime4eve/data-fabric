@@ -39,16 +39,18 @@ export interface SearchResult {
   highlight?: SearchHighlight;
 }
 
+export interface SearchResponseData {
+  results: SearchResult[];
+  total: number;
+  page: number;
+  size: number;
+  total_pages: number;
+  took: number;
+}
+
 export interface SearchResponse {
   success: boolean;
-  data: {
-    results: SearchResult[];
-    total: number;
-    page: number;
-    size: number;
-    total_pages: number;
-    took: number;
-  };
+  data: SearchResponseData;
   message?: string;
 }
 
@@ -95,37 +97,88 @@ export interface SearchStatsResponse {
 
 export class SearchService {
   /**
-   * 全文搜索文档
+   * 搜索文档
    */
-  static async searchDocuments(searchParams: SearchRequest): Promise<SearchResponse> {
-    const response = await api.post<SearchResponse>('/search/documents', searchParams);
-    return response.data;
+  static async searchDocuments(searchParams: SearchRequest): Promise<SearchResponseData> {
+    // 修复：使用POST方法调用正确的搜索端点
+    const response = await api.post('/search/documents', searchParams);
+    return response.data.data || response.data;
   }
 
   /**
    * 获取搜索建议
    */
-  static async getSearchSuggestions(prefix: string): Promise<SearchSuggestionsResponse> {
-    const response = await api.get<SearchSuggestionsResponse>('/search/suggestions', {
-      params: { prefix }
-    });
-    return response.data;
+  static async getSearchSuggestions(prefix: string): Promise<SearchSuggestion[]> {
+    const response = await api.get('/search/suggestions', { params: { prefix } });
+    const backendData = response.data.data || response.data;
+    
+    if (backendData.suggestions && Array.isArray(backendData.suggestions)) {
+      return backendData.suggestions;
+    }
+    return [];
   }
 
   /**
    * 获取搜索分类信息
    */
-  static async getSearchCategories(): Promise<SearchCategoriesResponse> {
-    const response = await api.get<SearchCategoriesResponse>('/search/categories');
-    return response.data;
+  static async getSearchCategories(): Promise<{
+    categories: SearchCategory[];
+    file_extensions: Array<{
+      extension: string;
+      doc_count: number;
+    }>;
+  }> {
+    const response = await api.get('/search/categories');
+    
+    // 后端返回的数据结构：{ categories: { "category": ["subcategory"] }, file_extensions: [".ext"] }
+    // 需要转换为前端期望的格式
+    const backendData = response.data.data || response.data;
+    const categories: SearchCategory[] = [];
+    
+    if (backendData.categories && typeof backendData.categories === 'object') {
+      Object.entries(backendData.categories).forEach(([category, subcategories]) => {
+        if (category && category.trim()) { // 过滤空分类
+          categories.push({
+            category,
+            subcategories: Array.isArray(subcategories) ? subcategories.filter(sub => sub && sub.trim()) : [],
+            doc_count: 0 // 后端暂未提供文档数量
+          });
+        }
+      });
+    }
+    
+    const file_extensions = Array.isArray(backendData.file_extensions) 
+      ? backendData.file_extensions.map((ext: string) => ({
+          extension: ext,
+          doc_count: 0 // 后端暂未提供文档数量
+        }))
+      : [];
+    
+    return {
+      categories,
+      file_extensions
+    };
   }
 
   /**
    * 获取搜索统计信息
    */
-  static async getSearchStats(): Promise<SearchStatsResponse> {
-    const response = await api.get<SearchStatsResponse>('/search/stats');
-    return response.data;
+  static async getSearchStats(): Promise<{
+    total_documents: number;
+    index_size: string;
+    index_name: string;
+  }> {
+    const response = await api.get('/search/stats');
+    
+    // 后端返回的数据结构：{ exists: true, document_count: 25, index_size: 595052, created: true }
+    // 需要转换为前端期望的格式
+    const backendData = response.data.data || response.data;
+    
+    return {
+      total_documents: backendData.document_count || 0,
+      index_size: backendData.index_size ? `${(backendData.index_size / 1024 / 1024).toFixed(2)} MB` : '0 MB',
+      index_name: 'knowledge_base_documents' // 默认索引名
+    };
   }
 
   /**

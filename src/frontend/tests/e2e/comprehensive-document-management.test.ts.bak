@@ -1,0 +1,315 @@
+/**
+ * 完整的文档管理E2E测试
+ * 涵盖所有核心功能：列表、查看、下载、编辑、删除、上传、搜索
+ */
+
+import { DocumentService } from '../../src/services/documentService';
+import { SearchService } from '../../src/services/searchService';
+import { CategoryService } from '../../src/services/categoryService';
+
+describe('完整文档管理E2E测试', () => {
+  let testDocumentId: string | null = null;
+  let testCategoryId: string | null = null;
+
+  beforeAll(async () => {
+    // 获取第一个可用的分类ID
+    try {
+      const categories = await CategoryService.getCategoryTree();
+      if (categories.data && categories.data.length > 0) {
+        testCategoryId = categories.data[0].id;
+      }
+    } catch (error) {
+      console.warn('无法获取分类信息，将使用默认分类ID');
+      testCategoryId = 'default-category-id';
+    }
+  });
+
+  describe('1. 文档列表功能', () => {
+    test('应该能够获取文档列表', async () => {
+      const response = await DocumentService.getDocuments({
+        page: 1,
+        size: 10
+      });
+
+      expect(response).toBeDefined();
+      expect(response.success).toBe(true);
+      expect(Array.isArray(response.data || response.documents)).toBe(true);
+      expect(typeof response.total).toBe('number');
+    });
+
+    test('应该能够按分类筛选文档', async () => {
+      if (!testCategoryId) {
+        console.warn('跳过分类筛选测试：无可用分类');
+        return;
+      }
+
+      const response = await DocumentService.getDocuments({
+        category_id: testCategoryId,
+        page: 1,
+        size: 10
+      });
+
+      expect(response).toBeDefined();
+      expect(response.success).toBe(true);
+      expect(Array.isArray(response.data || response.documents)).toBe(true);
+    });
+  });
+
+  describe('2. 文档上传功能', () => {
+    test('应该能够上传新文档', async () => {
+      if (!testCategoryId) {
+        console.warn('跳过文档上传测试：无可用分类');
+        return;
+      }
+
+      // 创建测试文件
+      const testContent = 'E2E测试文档内容\n这是一个用于测试的文档。\n包含多行文本内容。';
+      const testFile = new File([testContent], 'e2e-test-document.txt', {
+        type: 'text/plain'
+      });
+
+      const response = await DocumentService.uploadDocument(
+        testFile,
+        'E2E测试文档',
+        '这是一个E2E测试上传的文档',
+        testCategoryId
+      );
+
+      expect(response).toBeDefined();
+      expect(response.success).toBe(true);
+      expect(response.document).toBeDefined();
+      expect(response.document.id).toBeDefined();
+      expect(response.document.title).toBe('E2E测试文档');
+
+      // 保存测试文档ID供后续测试使用
+      testDocumentId = response.document.id;
+    });
+  });
+
+  describe('3. 文档详情查看功能', () => {
+    test('应该能够查看文档详情', async () => {
+      if (!testDocumentId) {
+        console.warn('跳过文档详情测试：无可用测试文档');
+        return;
+      }
+
+      const response = await DocumentService.getDocument(testDocumentId);
+
+      expect(response).toBeDefined();
+      expect(response.success).toBe(true);
+      expect(response.data).toBeDefined();
+      expect(response.data.id).toBe(testDocumentId);
+      expect(response.data.title).toBeDefined();
+      expect(response.data.file_name).toBeDefined();
+    });
+
+    test('查看不存在的文档应该返回错误', async () => {
+      const nonExistentId = 'non-existent-document-id';
+      
+      try {
+        const response = await DocumentService.getDocument(nonExistentId);
+        expect(response.success).toBe(false);
+      } catch (error) {
+        // 预期会抛出错误
+        expect(error).toBeDefined();
+      }
+    });
+  });
+
+  describe('4. 文档下载功能', () => {
+    test('应该能够下载文档', async () => {
+      if (!testDocumentId) {
+        console.warn('跳过文档下载测试：无可用测试文档');
+        return;
+      }
+
+      const blob = await DocumentService.downloadDocument(testDocumentId);
+
+      expect(blob).toBeDefined();
+      expect(blob instanceof Blob).toBe(true);
+      expect(blob.size).toBeGreaterThan(0);
+      
+      // 验证文件内容
+      const text = await blob.text();
+      expect(text).toContain('E2E测试文档内容');
+    });
+  });
+
+  describe('5. 文档编辑功能', () => {
+    test('应该能够更新文档信息', async () => {
+      if (!testDocumentId) {
+        console.warn('跳过文档编辑测试：无可用测试文档');
+        return;
+      }
+
+      const updatedTitle = 'E2E测试文档 (已编辑)';
+      const updatedDescription = '这是一个已编辑的E2E测试文档';
+
+      const response = await DocumentService.updateDocument(testDocumentId, {
+        title: updatedTitle,
+        description: updatedDescription
+      });
+
+      expect(response).toBeDefined();
+      expect(response.success).toBe(true);
+      expect(response.document).toBeDefined();
+      expect(response.document.title).toBe(updatedTitle);
+      expect(response.document.description).toBe(updatedDescription);
+    });
+  });
+
+  describe('6. 全文搜索功能', () => {
+    test('应该能够搜索文档', async () => {
+      const searchResponse = await SearchService.searchDocuments({
+        query: 'E2E测试',
+        page: 1,
+        size: 10
+      });
+
+      expect(searchResponse).toBeDefined();
+      expect(Array.isArray(searchResponse.results)).toBe(true);
+      expect(typeof searchResponse.total).toBe('number');
+      expect(typeof searchResponse.took).toBe('number');
+    });
+
+    test('应该能够获取搜索建议', async () => {
+      const suggestions = await SearchService.getSearchSuggestions('测试');
+
+      expect(Array.isArray(suggestions)).toBe(true);
+      // 搜索建议可能为空，这是正常的
+    });
+
+    test('应该能够获取搜索分类', async () => {
+      const categories = await SearchService.getSearchCategories();
+
+      expect(categories).toBeDefined();
+      expect(Array.isArray(categories.categories)).toBe(true);
+      expect(Array.isArray(categories.file_extensions)).toBe(true);
+    });
+  });
+
+  describe('7. 文档状态管理功能', () => {
+    test('应该能够发布文档', async () => {
+      if (!testDocumentId) {
+        console.warn('跳过文档发布测试：无可用测试文档');
+        return;
+      }
+
+      const response = await DocumentService.publishDocument(testDocumentId);
+
+      expect(response).toBeDefined();
+      expect(response.success).toBe(true);
+      expect(response.message).toBeDefined();
+    });
+
+    test('应该能够归档文档', async () => {
+      if (!testDocumentId) {
+        console.warn('跳过文档归档测试：无可用测试文档');
+        return;
+      }
+
+      const response = await DocumentService.archiveDocument(testDocumentId);
+
+      expect(response).toBeDefined();
+      expect(response.success).toBe(true);
+      expect(response.message).toBeDefined();
+    });
+  });
+
+  describe('8. 文档统计功能', () => {
+    test('应该能够获取文档统计信息', async () => {
+      const stats = await DocumentService.getDocumentStatistics();
+
+      expect(stats).toBeDefined();
+      expect(typeof stats.total_documents).toBe('number');
+      expect(typeof stats.published_documents).toBe('number');
+      expect(typeof stats.draft_documents).toBe('number');
+      expect(typeof stats.archived_documents).toBe('number');
+    });
+
+    test('应该能够获取搜索统计信息', async () => {
+      const searchStats = await SearchService.getSearchStats();
+
+      expect(searchStats).toBeDefined();
+      expect(typeof searchStats.total_documents).toBe('number');
+      expect(typeof searchStats.index_size).toBe('string');
+      expect(typeof searchStats.index_name).toBe('string');
+    });
+  });
+
+  describe('9. 文档删除功能', () => {
+    test('应该能够删除文档', async () => {
+      if (!testDocumentId) {
+        console.warn('跳过文档删除测试：无可用测试文档');
+        return;
+      }
+
+      const response = await DocumentService.deleteDocument(testDocumentId);
+
+      expect(response).toBeDefined();
+      expect(response.success).toBe(true);
+      expect(response.message).toBeDefined();
+
+      // 验证文档已被删除
+      try {
+        const getResponse = await DocumentService.getDocument(testDocumentId);
+        expect(getResponse.success).toBe(false);
+      } catch (error) {
+        // 预期会抛出错误，因为文档已被删除
+        expect(error).toBeDefined();
+      }
+
+      // 清空测试文档ID
+      testDocumentId = null;
+    });
+  });
+
+  describe('10. 错误处理测试', () => {
+    test('处理无效的文档ID', async () => {
+      const invalidId = 'invalid-document-id-12345';
+      
+      try {
+        const response = await DocumentService.getDocument(invalidId);
+        expect(response.success).toBe(false);
+      } catch (error) {
+        expect(error).toBeDefined();
+      }
+    });
+
+    test('处理空的搜索查询', async () => {
+      const searchResponse = await SearchService.searchDocuments({
+        query: '',
+        page: 1,
+        size: 10
+      });
+
+      expect(searchResponse).toBeDefined();
+      expect(Array.isArray(searchResponse.results)).toBe(true);
+    });
+
+    test('处理无效的分页参数', async () => {
+      const response = await DocumentService.getDocuments({
+        page: -1,
+        size: 0
+      });
+
+      expect(response).toBeDefined();
+      // 后端应该处理无效参数并返回合理的默认值
+    });
+  });
+
+  afterAll(() => {
+    console.log('完整文档管理E2E测试完成');
+    console.log('测试涵盖了以下功能：');
+    console.log('✓ 文档列表加载和筛选');
+    console.log('✓ 文档上传');
+    console.log('✓ 文档详情查看');
+    console.log('✓ 文档下载');
+    console.log('✓ 文档编辑');
+    console.log('✓ 全文搜索');
+    console.log('✓ 文档状态管理');
+    console.log('✓ 文档统计');
+    console.log('✓ 文档删除');
+    console.log('✓ 错误处理');
+  });
+});

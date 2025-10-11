@@ -1,0 +1,50 @@
+backend:
+  port: 5001
+database:
+  postgres:
+    port: 5432
+    url: postgresql://admin:123456@localhost:5432/knowledge_base
+  redis:
+    port: 6379
+    url: redis://localhost:6379/0
+development:
+  api_base_url: http://localhost:5000/api/v1
+  backend_port: 5000
+  frontend_port: 3000
+frontend:
+  port: 3000
+  url: http://localhost:3000
+graph_database:
+  nebula_graph:
+    port: 9669
+    url: bolt://localhost:9669
+internal:
+  backend:
+    port: 5000
+  elasticsearch:
+    port: 9200
+  grafana:
+    port: 3000
+  nebula_graph:
+    port: 9669
+  postgres:
+    port: 5432
+  prometheus:
+    port: 9090
+  redis:
+    port: 6379
+monitoring:
+  grafana:
+    port: 3001
+    url: http://localhost:3001
+  prometheus:
+    port: 9090
+    url: http://localhost:9090
+production:
+  api_base_url: http://localhost:5000/api/v1
+  backend_port: 5000
+  frontend_port: 80
+search:
+  elasticsearch:
+    port: 9200
+    url: http://localhost:9200

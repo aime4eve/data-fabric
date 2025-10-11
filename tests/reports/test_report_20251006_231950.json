@@ -1,0 +1,616 @@
+{
+  "test_execution_summary": {
+    "start_time": "2025-10-06T23:19:47.119646",
+    "end_time": "2025-10-06T23:19:50.072037",
+    "total_duration_seconds": 2.952391,
+    "total_test_cases": 31,
+    "passed": 29,
+    "failed": 2,
+    "skipped": 0,
+    "errors": 0,
+    "success_rate": 93.54838709677419
+  },
+  "test_cases": [
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_success_with_username",
+      "description": "测试使用用户名成功认证",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_success_with_username",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:47.121583",
+      "end_time": "2025-10-06T23:19:47.342705",
+      "duration": 0.2210838794708252,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_success_with_email",
+      "description": "测试使用邮箱成功认证",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_success_with_email",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:47.343797",
+      "end_time": "2025-10-06T23:19:47.534978",
+      "duration": 0.1911640167236328,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_user_not_found",
+      "description": "测试用户不存在的情况",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_user_not_found",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:47.535868",
+      "end_time": "2025-10-06T23:19:47.536741",
+      "duration": 0.0008602142333984375,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_wrong_password",
+      "description": "测试密码错误的情况",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_wrong_password",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:47.537473",
+      "end_time": "2025-10-06T23:19:47.704992",
+      "duration": 0.16750836372375488,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_empty_credentials",
+      "description": "测试空凭据的情况",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_empty_credentials",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:47.705951",
+      "end_time": "2025-10-06T23:19:47.706594",
+      "duration": 0.0006318092346191406,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_sql_injection_attempt",
+      "description": "测试SQL注入尝试",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_sql_injection_attempt",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:47.707335",
+      "end_time": "2025-10-06T23:19:47.708103",
+      "duration": 0.0007586479187011719,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestAuthenticate::test_authenticate_special_characters",
+      "description": "测试特殊字符处理",
+      "module": "test_auth_service",
+      "class": "TestAuthenticate",
+      "function": "test_authenticate_special_characters",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:47.708820",
+      "end_time": "2025-10-06T23:19:47.960910",
+      "duration": 0.2520780563354492,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_success",
+      "description": "测试成功注册",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_success",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:47.961728",
+      "end_time": "2025-10-06T23:19:48.046555",
+      "duration": 0.08481454849243164,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_username_exists",
+      "description": "测试用户名已存在",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_username_exists",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.047760",
+      "end_time": "2025-10-06T23:19:48.048645",
+      "duration": 0.0008709430694580078,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_email_exists",
+      "description": "测试邮箱已存在",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_email_exists",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.049668",
+      "end_time": "2025-10-06T23:19:48.050639",
+      "duration": 0.0009586811065673828,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_invalid_email_format",
+      "description": "测试无效邮箱格式",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_invalid_email_format",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.051548",
+      "end_time": "2025-10-06T23:19:48.052388",
+      "duration": 0.0008285045623779297,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_weak_password",
+      "description": "测试弱密码",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_weak_password",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.053386",
+      "end_time": "2025-10-06T23:19:48.054313",
+      "duration": 0.0009160041809082031,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRegister::test_register_admin_role",
+      "description": "测试注册管理员角色",
+      "module": "test_auth_service",
+      "class": "TestRegister",
+      "function": "test_register_admin_role",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.055214",
+      "end_time": "2025-10-06T23:19:48.144568",
+      "duration": 0.08934426307678223,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRefreshToken::test_refresh_token_success",
+      "description": "测试成功刷新令牌",
+      "module": "test_auth_service",
+      "class": "TestRefreshToken",
+      "function": "test_refresh_token_success",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.145522",
+      "end_time": "2025-10-06T23:19:48.235502",
+      "duration": 0.08996725082397461,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRefreshToken::test_refresh_token_invalid_token",
+      "description": "测试无效刷新令牌",
+      "module": "test_auth_service",
+      "class": "TestRefreshToken",
+      "function": "test_refresh_token_invalid_token",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.236276",
+      "end_time": "2025-10-06T23:19:48.237054",
+      "duration": 0.0007688999176025391,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestRefreshToken::test_refresh_token_user_not_found",
+      "description": "测试用户不存在",
+      "module": "test_auth_service",
+      "class": "TestRefreshToken",
+      "function": "test_refresh_token_user_not_found",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.237771",
+      "end_time": "2025-10-06T23:19:48.264020",
+      "duration": 0.026239395141601562,
+      "status": "failed",
+      "error_message": "self = <test_auth_service.TestAuthService.TestRefreshToken object at 0x73ed8d6a1940>\nauth_service = <application.services.auth_service.AuthService object at 0x73ed8d6f1b50>\nmock_user_repository = <Mock id='127464117312288'>\n\n    def test_refresh_token_user_not_found(self, auth_service, mock_user_repository):\n        \"\"\"测试用户不存在\"\"\"\n        # Arrange\n        mock_user_repository.find_by_id.return_value = None\n    \n        # Act & Assert\n        with patch('application.services.auth_service.decode_token') as mock_decode:\n            mock_decode.return_value = {'sub': '999'}\n    \n            with pytest.raises(AuthenticationError) as exc_info:\n                auth_service.refresh_token(\"valid_token\")\n    \n>           assert str(exc_info.value) == \"用户不存在\"\nE           AssertionError: assert '令牌刷新失败' == '用户不存在'\nE             - 用户不存在\nE             + 令牌刷新失败\n\n../../tests/unit/backend/test_auth_service.py:288: AssertionError",
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试失败: self = <test_auth_service.TestAuthService.TestRefreshToken object at 0x73ed8d6a1940>\nauth_service = <application.services.auth_service.AuthService object at 0x73ed8d6f1b50>\nmock_user_repository = <Mock id='127464117312288'>\n\n    def test_refresh_token_user_not_found(self, auth_service, mock_user_repository):\n        \"\"\"测试用户不存在\"\"\"\n        # Arrange\n        mock_user_repository.find_by_id.return_value = None\n    \n        # Act & Assert\n        with patch('application.services.auth_service.decode_token') as mock_decode:\n            mock_decode.return_value = {'sub': '999'}\n    \n            with pytest.raises(AuthenticationError) as exc_info:\n                auth_service.refresh_token(\"valid_token\")\n    \n>           assert str(exc_info.value) == \"用户不存在\"\nE           AssertionError: assert '令牌刷新失败' == '用户不存在'\nE             - 用户不存在\nE             + 令牌刷新失败\n\n../../tests/unit/backend/test_auth_service.py:288: AssertionError"
+    },
+    {
+      "test_id": "test_auth_service::TestChangePassword::test_change_password_success",
+      "description": "测试成功修改密码",
+      "module": "test_auth_service",
+      "class": "TestChangePassword",
+      "function": "test_change_password_success",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.265303",
+      "end_time": "2025-10-06T23:19:48.536502",
+      "duration": 0.27118754386901855,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestChangePassword::test_change_password_user_not_found",
+      "description": "测试用户不存在",
+      "module": "test_auth_service",
+      "class": "TestChangePassword",
+      "function": "test_change_password_user_not_found",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.537528",
+      "end_time": "2025-10-06T23:19:48.538253",
+      "duration": 0.0007135868072509766,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestChangePassword::test_change_password_wrong_old_password",
+      "description": "测试旧密码错误",
+      "module": "test_auth_service",
+      "class": "TestChangePassword",
+      "function": "test_change_password_wrong_old_password",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.538880",
+      "end_time": "2025-10-06T23:19:48.708491",
+      "duration": 0.1696012020111084,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestChangePassword::test_change_password_same_as_old",
+      "description": "测试新密码与旧密码相同",
+      "module": "test_auth_service",
+      "class": "TestChangePassword",
+      "function": "test_change_password_same_as_old",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.709341",
+      "end_time": "2025-10-06T23:19:48.875339",
+      "duration": 0.1659843921661377,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestResetPassword::test_reset_password_success",
+      "description": "测试成功重置密码",
+      "module": "test_auth_service",
+      "class": "TestResetPassword",
+      "function": "test_reset_password_success",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:48.876176",
+      "end_time": "2025-10-06T23:19:49.043559",
+      "duration": 0.1673717498779297,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestResetPassword::test_reset_password_user_not_found",
+      "description": "测试用户不存在",
+      "module": "test_auth_service",
+      "class": "TestResetPassword",
+      "function": "test_reset_password_user_not_found",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:49.044444",
+      "end_time": "2025-10-06T23:19:49.045167",
+      "duration": 0.0007121562957763672,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestPasswordSecurity::test_password_hashing",
+      "description": "测试密码哈希",
+      "module": "test_auth_service",
+      "class": "TestPasswordSecurity",
+      "function": "test_password_hashing",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:49.045980",
+      "end_time": "2025-10-06T23:19:49.211185",
+      "duration": 0.16519403457641602,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestPasswordSecurity::test_password_verification",
+      "description": "测试密码验证",
+      "module": "test_auth_service",
+      "class": "TestPasswordSecurity",
+      "function": "test_password_verification",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:49.212076",
+      "end_time": "2025-10-06T23:19:49.462728",
+      "duration": 0.2506403923034668,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestPasswordSecurity::test_password_salt_uniqueness",
+      "description": "测试密码盐值唯一性",
+      "module": "test_auth_service",
+      "class": "TestPasswordSecurity",
+      "function": "test_password_salt_uniqueness",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:49.463758",
+      "end_time": "2025-10-06T23:19:49.803758",
+      "duration": 0.33998632431030273,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestInputValidation::test_validate_empty_inputs",
+      "description": "测试空输入验证",
+      "module": "test_auth_service",
+      "class": "TestInputValidation",
+      "function": "test_validate_empty_inputs",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:49.804671",
+      "end_time": "2025-10-06T23:19:49.805452",
+      "duration": 0.0007698535919189453,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestInputValidation::test_validate_none_inputs",
+      "description": "测试None输入验证",
+      "module": "test_auth_service",
+      "class": "TestInputValidation",
+      "function": "test_validate_none_inputs",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:49.806766",
+      "end_time": "2025-10-06T23:19:49.807487",
+      "duration": 0.0007085800170898438,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestInputValidation::test_validate_whitespace_inputs",
+      "description": "测试空白字符输入验证",
+      "module": "test_auth_service",
+      "class": "TestInputValidation",
+      "function": "test_validate_whitespace_inputs",
+      "markers": [
+        "unit"
+      ],
+      "start_time": "2025-10-06T23:19:49.808168",
+      "end_time": "2025-10-06T23:19:49.808806",
+      "duration": 0.0006282329559326172,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestSecurityFeatures::test_timing_attack_resistance",
+      "description": "测试时序攻击防护",
+      "module": "test_auth_service",
+      "class": "TestSecurityFeatures",
+      "function": "test_timing_attack_resistance",
+      "markers": [
+        "security"
+      ],
+      "start_time": "2025-10-06T23:19:49.809600",
+      "end_time": "2025-10-06T23:19:49.976076",
+      "duration": 0.16646385192871094,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    },
+    {
+      "test_id": "test_auth_service::TestSecurityFeatures::test_password_complexity_validation",
+      "description": "测试密码复杂度验证",
+      "module": "test_auth_service",
+      "class": "TestSecurityFeatures",
+      "function": "test_password_complexity_validation",
+      "markers": [
+        "security"
+      ],
+      "start_time": "2025-10-06T23:19:49.976916",
+      "end_time": "2025-10-06T23:19:50.070272",
+      "duration": 0.09334468841552734,
+      "status": "failed",
+      "error_message": "self = <test_auth_service.TestAuthService.TestSecurityFeatures object at 0x73ed8d6a3fb0>\nauth_service = <application.services.auth_service.AuthService object at 0x73ed8d6b72f0>\nmock_user_repository = <Mock id='127464117072672'>\n\n    def test_password_complexity_validation(self, auth_service, mock_user_repository):\n        \"\"\"测试密码复杂度验证\"\"\"\n        mock_user_repository.exists_by_username.return_value = False\n        mock_user_repository.exists_by_email.return_value = False\n    \n        # 测试各种弱密码\n        weak_passwords = [\n            \"123\",          # 太短\n            \"password\",     # 常见密码\n            \"12345678\",     # 纯数字\n            \"abcdefgh\",     # 纯字母\n        ]\n    \n        for weak_password in weak_passwords:\n>           with pytest.raises(AuthenticationError):\nE           Failed: DID NOT RAISE <class 'shared_kernel.exceptions.auth_exceptions.AuthenticationError'>\n\n../../tests/unit/backend/test_auth_service.py:478: Failed",
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试失败: self = <test_auth_service.TestAuthService.TestSecurityFeatures object at 0x73ed8d6a3fb0>\nauth_service = <application.services.auth_service.AuthService object at 0x73ed8d6b72f0>\nmock_user_repository = <Mock id='127464117072672'>\n\n    def test_password_complexity_validation(self, auth_service, mock_user_repository):\n        \"\"\"测试密码复杂度验证\"\"\"\n        mock_user_repository.exists_by_username.return_value = False\n        mock_user_repository.exists_by_email.return_value = False\n    \n        # 测试各种弱密码\n        weak_passwords = [\n            \"123\",          # 太短\n            \"password\",     # 常见密码\n            \"12345678\",     # 纯数字\n            \"abcdefgh\",     # 纯字母\n        ]\n    \n        for weak_password in weak_passwords:\n>           with pytest.raises(AuthenticationError):\nE           Failed: DID NOT RAISE <class 'shared_kernel.exceptions.auth_exceptions.AuthenticationError'>\n\n../../tests/unit/backend/test_auth_service.py:478: Failed"
+    },
+    {
+      "test_id": "test_auth_service::TestSecurityFeatures::test_xss_prevention_in_error_messages",
+      "description": "测试错误消息中的XSS防护",
+      "module": "test_auth_service",
+      "class": "TestSecurityFeatures",
+      "function": "test_xss_prevention_in_error_messages",
+      "markers": [
+        "security"
+      ],
+      "start_time": "2025-10-06T23:19:50.071261",
+      "end_time": "2025-10-06T23:19:50.071989",
+      "duration": 0.0007171630859375,
+      "status": "passed",
+      "error_message": null,
+      "steps": [],
+      "input_data": {},
+      "expected_result": "测试应该通过",
+      "actual_result": "测试通过"
+    }
+  ],
+  "environment_info": {
+    "python_version": "3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]",
+    "pytest_version": "7.4.4",
+    "operating_system": "posix",
+    "frontend_url": "http://localhost:3000",
+    "backend_url": "http://localhost:5000"
+  },
+  "compliance_info": {
+    "security_standards": "符合政府安全标准要求",
+    "automation_framework": "适用于自动化测试框架",
+    "manual_intervention": "最小化人工干预"
+  }
+}

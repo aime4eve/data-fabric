@@ -19,6 +19,13 @@ class AuthService:
     
     def authenticate(self, username_or_email: str, password: str) -> Dict[str, Any]:
         """用户认证"""
+        # 输入验证
+        if not username_or_email or not password:
+            raise AuthenticationError("用户名和密码不能为空")
+        
+        if not username_or_email.strip() or not password.strip():
+            raise AuthenticationError("用户名和密码不能为空")
+        
         # 查找用户
         user = self._find_user_by_username_or_email(username_or_email)
         if not user:
@@ -53,6 +60,35 @@ class AuthService:
     
     def register(self, username: str, email: str, password: str, role: str = 'user') -> User:
         """用户注册"""
+        # 输入验证
+        if not username or not email or not password:
+            raise AuthenticationError("用户名、邮箱和密码不能为空")
+        
+        if not username.strip() or not email.strip() or not password.strip():
+            raise AuthenticationError("用户名、邮箱和密码不能为空")
+        
+        # 邮箱格式验证
+        import re
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, email):
+            raise AuthenticationError("邮箱格式不正确")
+        
+        # 密码强度验证
+        if len(password) < 6:
+            raise AuthenticationError("密码长度至少6位")
+        
+        # 检查是否为常见弱密码
+        weak_passwords = ["password", "123456", "12345678", "qwerty", "abc123"]
+        if password.lower() in weak_passwords:
+            raise AuthenticationError("密码过于简单，请使用更复杂的密码")
+        
+        # 检查密码复杂度
+        if password.isdigit():
+            raise AuthenticationError("密码不能全为数字")
+        
+        if password.isalpha():
+            raise AuthenticationError("密码不能全为字母")
+        
         # 检查用户名是否已存在
         if self.user_repository.exists_by_username(username):
             raise AuthenticationError("用户名已存在")
@@ -70,7 +106,8 @@ class AuthService:
             role=role
         )
         
-        return self.user_repository.save(user)
+        saved_user = self.user_repository.save(user)
+        return saved_user if saved_user else user
     
     def refresh_token(self, refresh_token: str) -> Dict[str, str]:
         """刷新令牌"""
@@ -91,8 +128,15 @@ class AuthService:
                 }
             )
             
-            return {'access_token': access_token}
+            new_refresh_token = create_refresh_token(identity=user.id)
             
+            return {
+                'access_token': access_token,
+                'refresh_token': new_refresh_token
+            }
+        except AuthenticationError:
+            # 重新抛出认证错误，保持原始错误消息
+            raise
         except Exception as e:
             raise AuthenticationError("令牌刷新失败")
     
@@ -104,13 +148,17 @@ class AuthService:
         
         # 验证旧密码
         if not self._verify_password(old_password, user.password_hash):
-            raise AuthenticationError("原密码错误")
+            raise AuthenticationError("旧密码错误")
+        
+        # 检查新密码是否与旧密码相同
+        if old_password == new_password:
+            raise AuthenticationError("新密码不能与旧密码相同")
         
         # 更新密码
         new_password_hash = self._hash_password(new_password)
         user.update_password(new_password_hash)
         
-        self.user_repository.update(user)
+        self.user_repository.save(user)
         return True
     
     def reset_password(self, email: str, new_password: str) -> bool:
@@ -123,7 +171,7 @@ class AuthService:
         new_password_hash = self._hash_password(new_password)
         user.update_password(new_password_hash)
         
-        self.user_repository.update(user)
+        self.user_repository.save(user)
         return True
     
     def _find_user_by_username_or_email(self, username_or_email: str) -> Optional[User]:
@@ -138,8 +186,8 @@ class AuthService:
     
     def _hash_password(self, password: str) -> str:
         """密码哈希"""
-        salt = bcrypt.gensalt()
-        return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+        from werkzeug.security import generate_password_hash
+        return generate_password_hash(password)
     
     def _verify_password(self, password: str, password_hash: str) -> bool:
         """验证密码"""

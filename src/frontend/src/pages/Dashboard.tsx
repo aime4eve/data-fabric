@@ -47,7 +47,7 @@ export const Dashboard: React.FC = () => {
         size: 5,
       });
       if (documentsResponse.success) {
-        setRecentDocuments(documentsResponse.data);
+        setRecentDocuments(documentsResponse.data || []);
       }
     } catch (error) {
       console.error('加载仪表板数据失败:', error);

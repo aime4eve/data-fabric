@@ -48,8 +48,8 @@ class TestAuthService:
             mock_user_repository.find_by_email.return_value = None
 
             # Act
-            with patch('src.backend.application.services.auth_service.create_access_token') as mock_access_token, \
-                 patch('src.backend.application.services.auth_service.create_refresh_token') as mock_refresh_token:
+            with patch('application.services.auth_service.create_access_token') as mock_access_token, \
+                 patch('application.services.auth_service.create_refresh_token') as mock_refresh_token:
                 mock_access_token.return_value = "access_token_123"
                 mock_refresh_token.return_value = "refresh_token_123"
                 
@@ -69,8 +69,8 @@ class TestAuthService:
             mock_user_repository.find_by_email.return_value = sample_user
 
             # Act
-            with patch('src.backend.application.services.auth_service.create_access_token') as mock_access_token, \
-                 patch('src.backend.application.services.auth_service.create_refresh_token') as mock_refresh_token:
+            with patch('application.services.auth_service.create_access_token') as mock_access_token, \
+                 patch('application.services.auth_service.create_refresh_token') as mock_refresh_token:
                 mock_access_token.return_value = "access_token_123"
                 mock_refresh_token.return_value = "refresh_token_123"
                 
@@ -142,8 +142,8 @@ class TestAuthService:
             mock_user_repository.find_by_username.return_value = special_user
 
             # Act
-            with patch('src.backend.application.services.auth_service.create_access_token') as mock_access_token, \
-                 patch('src.backend.application.services.auth_service.create_refresh_token') as mock_refresh_token:
+            with patch('application.services.auth_service.create_access_token') as mock_access_token, \
+                 patch('application.services.auth_service.create_refresh_token') as mock_refresh_token:
                 mock_access_token.return_value = "access_token_123"
                 mock_refresh_token.return_value = "refresh_token_123"
                 
@@ -161,10 +161,16 @@ class TestAuthService:
             # Arrange
             mock_user_repository.exists_by_username.return_value = False
             mock_user_repository.exists_by_email.return_value = False
-            mock_user_repository.save.return_value = None
+            
+            # Create a mock user to return from save
+            mock_saved_user = Mock()
+            mock_saved_user.username = "newuser"
+            mock_saved_user.email = "newuser@test.com"
+            mock_saved_user.role = "user"
+            mock_user_repository.save.return_value = mock_saved_user
 
             # Act
-            result = auth_service.register("newuser", "newuser@test.com", "123456")
+            result = auth_service.register("newuser", "newuser@test.com", "complex123")
 
             # Assert
             assert result.username == "newuser"
@@ -179,7 +185,7 @@ class TestAuthService:
 
             # Act & Assert
             with pytest.raises(AuthenticationError) as exc_info:
-                auth_service.register("existinguser", "new@test.com", "123456")
+                auth_service.register("existinguser", "new@test.com", "complex123")
             
             assert str(exc_info.value) == "用户名已存在"
 
@@ -191,7 +197,7 @@ class TestAuthService:
 
             # Act & Assert
             with pytest.raises(AuthenticationError) as exc_info:
-                auth_service.register("newuser", "existing@test.com", "123456")
+                auth_service.register("newuser", "existing@test.com", "complex123")
             
             assert str(exc_info.value) == "邮箱已存在"
 
@@ -220,10 +226,16 @@ class TestAuthService:
             # Arrange
             mock_user_repository.exists_by_username.return_value = False
             mock_user_repository.exists_by_email.return_value = False
-            mock_user_repository.save.return_value = None
+            
+            # Create a mock user with admin role
+            mock_admin_user = Mock()
+            mock_admin_user.username = "admin"
+            mock_admin_user.email = "admin@test.com"
+            mock_admin_user.role = "admin"
+            mock_user_repository.save.return_value = mock_admin_user
 
             # Act
-            result = auth_service.register("admin", "admin@test.com", "123456", "admin")
+            result = auth_service.register("admin", "admin@test.com", "complex123", "admin")
 
             # Assert
             assert result.role == "admin"
@@ -238,9 +250,9 @@ class TestAuthService:
             mock_user_repository.find_by_id.return_value = sample_user
 
             # Act
-            with patch('src.backend.application.services.auth_service.decode_token') as mock_decode, \
-                 patch('src.backend.application.services.auth_service.create_access_token') as mock_access_token, \
-                 patch('src.backend.application.services.auth_service.create_refresh_token') as mock_refresh_token:
+            with patch('application.services.auth_service.decode_token') as mock_decode, \
+                 patch('application.services.auth_service.create_access_token') as mock_access_token, \
+                 patch('application.services.auth_service.create_refresh_token') as mock_refresh_token:
                 
                 mock_decode.return_value = {'sub': '1'}
                 mock_access_token.return_value = "new_access_token"
@@ -255,7 +267,7 @@ class TestAuthService:
         def test_refresh_token_invalid_token(self, auth_service, mock_user_repository):
             """测试无效刷新令牌"""
             # Act & Assert
-            with patch('src.backend.application.services.auth_service.decode_token') as mock_decode:
+            with patch('application.services.auth_service.decode_token') as mock_decode:
                 mock_decode.side_effect = Exception("Invalid token")
                 
                 with pytest.raises(AuthenticationError):
@@ -267,7 +279,7 @@ class TestAuthService:
             mock_user_repository.find_by_id.return_value = None
 
             # Act & Assert
-            with patch('src.backend.application.services.auth_service.decode_token') as mock_decode:
+            with patch('application.services.auth_service.decode_token') as mock_decode:
                 mock_decode.return_value = {'sub': '999'}
                 
                 with pytest.raises(AuthenticationError) as exc_info:

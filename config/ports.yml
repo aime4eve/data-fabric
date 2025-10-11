@@ -1,0 +1,72 @@
+# 知识库应用系统端口配置
+# 所有端口配置集中管理，便于统一维护
+
+# 前端服务端口
+frontend:
+  port: 3000
+  url: http://localhost:3000
+
+# 后端API服务端口
+backend:
+  port: 5000
+  url: http://localhost:5000
+  api_base_url: http://localhost:5000/api/v1
+
+# 数据库服务端口
+database:
+  postgres:
+    port: 5432
+    url: postgresql://admin:123456@localhost:5432/knowledge_base
+  redis:
+    port: 6379
+    url: redis://localhost:6379/0
+
+# 搜索服务端口
+search:
+  elasticsearch:
+    port: 9200
+    url: http://localhost:9200
+
+# 图数据库端口
+graph_database:
+  nebula_graph:
+    port: 9669
+    url: bolt://localhost:9669
+
+# 监控服务端口
+monitoring:
+  prometheus:
+    port: 9090
+    url: http://localhost:9090
+  grafana:
+    port: 3001
+    url: http://localhost:3001
+
+# 容器内部服务通信端口（容器间通信）
+internal:
+  backend:
+    port: 5000
+  postgres:
+    port: 5432
+  redis:
+    port: 6379
+  elasticsearch:
+    port: 9200
+  nebula_graph:
+    port: 9669
+  prometheus:
+    port: 9090
+  grafana:
+    port: 3000  # Grafana容器内部端口
+
+# 开发环境配置
+development:
+  frontend_port: 3000
+  backend_port: 5000
+  api_base_url: http://localhost:5000/api/v1
+
+# 生产环境配置
+production:
+  frontend_port: 80
+  backend_port: 5000
+  api_base_url: http://localhost:5000/api/v1

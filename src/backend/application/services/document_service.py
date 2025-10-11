@@ -27,10 +27,14 @@ class DocumentService:
         filename: str,
         category_id: str,
         author_id: str,
-        content_type: str = None
+        content_type: str = None,
+        description: str = '',
+        upload_directory: str = ''
     ) -> Document:
         """上传文档"""
+        print("--- Starting document upload ---")
         try:
+            print(f"Title: {title}, Filename: {filename}, Category: {category_id}")
             # 暂时使用本地路径，避免MinIO连接错误
             content_path = f"local/documents/{filename}"
             
@@ -64,7 +68,9 @@ class DocumentService:
                 metadata={
                     'original_filename': filename,
                     'content_type': content_type,
-                    'file_size': file_size
+                    'file_size': file_size,
+                    'description': description,
+                    'upload_directory': upload_directory
                 }
             )
             
@@ -101,6 +107,10 @@ class DocumentService:
     def get_document_info(self, document_id: str) -> Optional[Document]:
         """获取文档信息"""
         return self.document_repository.find_by_id(document_id)
+    
+    def get_document_by_id(self, document_id: str) -> Optional[Document]:
+        """根据ID获取文档（别名方法）"""
+        return self.get_document_info(document_id)
     
     def update_document(
         self, 
@@ -252,17 +262,5 @@ class DocumentService:
                 'user_id': user_id
             }
         else:
-            # 实现全局统计
-            all_documents = self.document_repository.find_all(page=1, size=1000)  # 简化实现
-            total_count = len(all_documents)
-            
-            published_count = len([doc for doc in all_documents if doc.status == DocumentStatus.PUBLISHED])
-            draft_count = len([doc for doc in all_documents if doc.status == DocumentStatus.DRAFT])
-            archived_count = len([doc for doc in all_documents if doc.status == DocumentStatus.ARCHIVED])
-            
-            return {
-                'total_documents': total_count,
-                'published_documents': published_count,
-                'draft_documents': draft_count,
-                'archived_documents': archived_count
-            }
+            # 使用高效的统计方法
+            return self.document_repository.get_document_statistics()

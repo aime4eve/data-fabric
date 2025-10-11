@@ -25,7 +25,7 @@ RUN poetry install --only=main --no-root
 COPY . .
 
 # Expose port
-EXPOSE 8000
+EXPOSE 5000
 
 # Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "app:create_app()"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "app:create_app()"]

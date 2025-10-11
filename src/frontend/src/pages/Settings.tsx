@@ -73,8 +73,8 @@ const Settings: React.FC = () => {
     id: user?.id || '',
     username: user?.username || '',
     email: user?.email || '',
-    fullName: user?.fullName || '',
-    avatar: user?.avatar,
+    fullName: '',
+    avatar: undefined,
     phone: '',
     department: '',
     position: ''
@@ -106,8 +106,8 @@ const Settings: React.FC = () => {
         id: user?.id || '1',
         username: user?.username || 'admin',
         email: user?.email || 'admin@example.com',
-        fullName: user?.fullName || '管理员',
-        avatar: user?.avatar,
+        fullName: '管理员',
+        avatar: undefined,
         phone: '138****8888',
         department: '技术部',
         position: '系统管理员'

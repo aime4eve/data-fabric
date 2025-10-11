@@ -38,7 +38,7 @@ check_service "Docker Compose" "docker-compose --version" "Docker Compose已安�
 
 # 检查服务状态
 echo -e "${BLUE}🚀 检查服务状态...${NC}"
-check_service "NebulaGraph" "docker-compose ps | grep 'nebula-graphd.*Up'" "NebulaGraph运行中" "NebulaGraph未运行"
+check_service "NebulaGraph" "docker-compose ps | grep 'nebula-graph.*Up'" "NebulaGraph运行中" "NebulaGraph未运行"
 check_service "Redis" "docker-compose ps | grep 'redis.*Up'" "Redis运行中" "Redis未运行"
 
 # 检查Python环境
@@ -90,12 +90,64 @@ check_port 9669 "NebulaGraph"
 
 # 数据库连接测试
 echo -e "${BLUE}🔗 测试数据库连接...${NC}"
-echo -n "  NebulaGraph连接测试 ... "
-if docker-compose exec -T nebula-graphd nebula -u root -p nebula -e "SHOW SPACES;" > /dev/null 2>&1; then
+
+# PostgreSQL连接测试
+echo -n "  PostgreSQL连接测试 ... "
+if docker-compose exec -T postgres pg_isready -U admin -d knowledge_base > /dev/null 2>&1; then
     echo -e "${GREEN}✅ 连接成功${NC}"
 else
     echo -e "${RED}❌ 连接失败${NC}"
 fi
+
+# Redis连接测试
+echo -n "  Redis连接测试 ... "
+if docker-compose exec -T redis redis-cli ping > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ 连接成功${NC}"
+else
+    echo -e "${RED}❌ 连接失败${NC}"
+fi
+
+# NebulaGraph连接测试
+echo -n "  NebulaGraph连接测试 ... "
+if docker-compose exec -T nebula-graph bash -c "/usr/local/nebula/bin/nebula-graphd --version" > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ 连接成功${NC}"
+else
+    echo -e "${RED}❌ 连接失败${NC}"
+fi
+
+# Elasticsearch连接测试
+echo -n "  Elasticsearch连接测试 ... "
+if docker-compose exec -T elasticsearch curl -s http://localhost:9200/_cluster/health > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ 连接成功${NC}"
+else
+    echo -e "${RED}❌ 连接失败${NC}"
+fi
+
+# 监控服务连接测试
+echo -n "  Prometheus连接测试 ... "
+if docker-compose exec -T prometheus wget -q --spider http://localhost:9090/graph > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ 连接成功${NC}"
+else
+    echo -e "${RED}❌ 连接失败${NC}"
+fi
+
+echo -n "  Grafana连接测试 ... "
+if docker-compose exec -T grafana wget -q --spider http://localhost:3000 > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ 连接成功${NC}"
+else
+    echo -e "${RED}❌ 连接失败${NC}"
+fi
+
+# 检查所有基础设施服务状态
+echo -e "${BLUE}📊 基础设施服务状态汇总...${NC}"
+for service in postgres redis nebula-graph elasticsearch prometheus grafana; do
+    status=$(docker-compose ps $service 2>/dev/null | tail -n 1 | awk '{print $4}')
+    if echo "$status" | grep -q "Up"; then
+        echo -e "  $service: ${GREEN}✅ 运行中${NC}"
+    else
+        echo -e "  $service: ${RED}❌ 未运行${NC}"
+    fi
+done
 
 echo ""
 echo "📋 环境检查完成！"
@@ -104,5 +156,7 @@ echo "🎯 建议操作:"
 echo "  1. 如果Docker服务未运行: docker-compose up -d"
 echo "  2. 如果Python虚拟环境未创建: python3 -m venv venv"
 echo "  3. 如果Node.js依赖未安装: cd src/frontend && npm install"
-echo "  4. 如果配置文件不存在: ./scripts/dev/setup/setup_env.sh"
+echo "  4. 如果配置文件不存在: ./scripts/dev/start_dev.sh (首次运行会自动创建)"
 echo "  5. 如果端口被占用: 修改配置文件中的端口设置"
+echo "  6. 如果基础设施服务未运行: docker-compose up -d postgres redis nebula-graph elasticsearch"
+echo "  7. 如果监控服务未运行: docker-compose up -d prometheus grafana"

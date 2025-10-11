@@ -9,8 +9,8 @@
       "DOM.Iterable"
     ],
     "module": "ESNext",
-    "skipLibCheck": true,
     "moduleResolution": "bundler",
+    "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": false,
     "moduleDetection": "force",
@@ -22,15 +22,19 @@
     "noFallthroughCasesInSwitch": false,
     "noUncheckedSideEffectImports": false,
     "forceConsistentCasingInFileNames": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
     "paths": {
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    "types": ["jest", "@testing-library/jest-dom", "node"]
   },
   "include": [
     "src",
-    "api"
+    "api",
+    "tests"
   ]
 }

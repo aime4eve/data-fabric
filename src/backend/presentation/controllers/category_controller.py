@@ -1,13 +1,14 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import uuid
 
 # 创建分类命名空间
 category_ns = Namespace('categories', description='分类管理相关操作')
 
 # 分类模型定义（移除循环引用的children字段）
 category_model = category_ns.model('Category', {
-    'id': fields.Integer(required=True, description='分类ID'),
+    'id': fields.String(required=True, description='分类ID'),
     'name': fields.String(required=True, description='分类名称'),
     'description': fields.String(description='分类描述'),
     'parent_id': fields.Integer(description='父分类ID'),
@@ -51,9 +52,9 @@ class CategoryListResource(Resource):
         # 模拟数据
         mock_categories = [
             {
-                'id': 1,
-                'name': '技术文档',
-                'description': '技术相关文档分类',
+                'id': str(uuid.uuid4()),
+                'name': '公司基本信息',
+                'description': '公司基本信息相关文档',
                 'parent_id': None,
                 'level': 1,
                 'sort_order': 1,
@@ -62,12 +63,12 @@ class CategoryListResource(Resource):
                 'updated_at': '2024-01-01T00:00:00'
             },
             {
-                'id': 2,
-                'name': 'Python',
-                'description': 'Python编程相关',
-                'parent_id': 1,
-                'level': 2,
-                'sort_order': 1,
+                'id': str(uuid.uuid4()),
+                'name': '人力资源中心',
+                'description': '人力资源管理相关文档',
+                'parent_id': None,
+                'level': 1,
+                'sort_order': 2,
                 'is_active': True,
                 'created_at': '2024-01-01T00:00:00',
                 'updated_at': '2024-01-01T00:00:00'
@@ -108,21 +109,21 @@ class CategoryTreeResource(Resource):
     @category_ns.doc('获取分类树结构')
     def get(self):
         """获取分类树结构"""
-        # 返回简化的树结构，避免循环引用
+        # 返回与文档分类功能维护的真实分类数据
         mock_tree = [
             {
                 'id': 1,
-                'name': '技术文档',
-                'description': '技术相关文档分类',
+                'name': '公司基本信息',
+                'description': '公司基本信息相关文档',
                 'parent_id': None,
                 'level': 1,
                 'sort_order': 1,
                 'is_active': True,
                 'children': [
                     {
-                        'id': 2,
-                        'name': 'Python',
-                        'description': 'Python编程相关',
+                        'id': 11,
+                        'name': '企业文化和价值观',
+                        'description': '企业文化和价值观相关文档',
                         'parent_id': 1,
                         'level': 2,
                         'sort_order': 1,
@@ -130,9 +131,9 @@ class CategoryTreeResource(Resource):
                         'children': []
                     },
                     {
-                        'id': 3,
-                        'name': 'JavaScript',
-                        'description': 'JavaScript编程相关',
+                        'id': 12,
+                        'name': '公司简介与发展历程',
+                        'description': '公司简介与发展历程相关文档',
                         'parent_id': 1,
                         'level': 2,
                         'sort_order': 2,
@@ -142,14 +143,97 @@ class CategoryTreeResource(Resource):
                 ]
             },
             {
-                'id': 4,
-                'name': '业务文档',
-                'description': '业务相关文档分类',
+                'id': 2,
+                'name': '人力资源中心',
+                'description': '人力资源管理相关文档',
                 'parent_id': None,
                 'level': 1,
                 'sort_order': 2,
                 'is_active': True,
-                'children': []
+                'children': [
+                    {
+                        'id': 21,
+                        'name': '人事档案管理',
+                        'description': '人事档案管理相关文档',
+                        'parent_id': 2,
+                        'level': 2,
+                        'sort_order': 1,
+                        'is_active': True,
+                        'children': []
+                    },
+                    {
+                        'id': 22,
+                        'name': '员工关系管理',
+                        'description': '员工关系管理相关文档',
+                        'parent_id': 2,
+                        'level': 2,
+                        'sort_order': 2,
+                        'is_active': True,
+                        'children': []
+                    }
+                ]
+            },
+            {
+                'id': 3,
+                'name': '财务管理中心',
+                'description': '财务管理相关文档',
+                'parent_id': None,
+                'level': 1,
+                'sort_order': 3,
+                'is_active': True,
+                'children': [
+                    {
+                        'id': 31,
+                        'name': '财务制度与流程',
+                        'description': '财务制度与流程相关文档',
+                        'parent_id': 3,
+                        'level': 2,
+                        'sort_order': 1,
+                        'is_active': True,
+                        'children': []
+                    },
+                    {
+                        'id': 32,
+                        'name': '财务报表与分析',
+                        'description': '财务报表与分析相关文档',
+                        'parent_id': 3,
+                        'level': 2,
+                        'sort_order': 2,
+                        'is_active': True,
+                        'children': []
+                    }
+                ]
+            },
+            {
+                'id': 4,
+                'name': '技术研发中心',
+                'description': '技术研发相关文档',
+                'parent_id': None,
+                'level': 1,
+                'sort_order': 4,
+                'is_active': True,
+                'children': [
+                    {
+                        'id': 41,
+                        'name': '产品规格书',
+                        'description': '产品规格书相关文档',
+                        'parent_id': 4,
+                        'level': 2,
+                        'sort_order': 1,
+                        'is_active': True,
+                        'children': []
+                    },
+                    {
+                        'id': 42,
+                        'name': '技术标准文档',
+                        'description': '技术标准文档',
+                        'parent_id': 4,
+                        'level': 2,
+                        'sort_order': 2,
+                        'is_active': True,
+                        'children': []
+                    }
+                ]
             }
         ]
         
@@ -164,8 +248,8 @@ class CategoryResource(Resource):
         # 模拟获取分类详情
         mock_category = {
             'id': category_id,
-            'name': '技术文档',
-            'description': '技术相关文档分类',
+            'name': '公司基本信息',
+            'description': '公司基本信息相关文档',
             'parent_id': None,
             'level': 1,
             'sort_order': 1,
@@ -186,7 +270,7 @@ class CategoryResource(Resource):
         # 模拟更新分类
         updated_category = {
             'id': category_id,
-            'name': data.get('name', '技术文档'),
+            'name': data.get('name', '公司基本信息'),
             'description': data.get('description', ''),
             'parent_id': data.get('parent_id'),
             'level': 1,

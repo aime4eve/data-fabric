@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Enterprise Knowledge Base Management System Backend"
 authors = ["Knowledge Base Team <team@hktlora.com>"]
 readme = "README.md"
+packages = [{include = "knowledge_base_backend", from = "."}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -32,6 +33,7 @@ python-multipart = "^0.0.6"
 pypdf2 = "^3.0.1"
 python-docx = "^1.1.0"
 openpyxl = "^3.1.2"
+pyyaml = "^6.0.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"

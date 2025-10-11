@@ -61,79 +61,78 @@ export class UserService {
   /**
    * 获取当前用户个人信息
    */
-  static async getProfile(): Promise<ApiResponse<UserProfile>> {
+  static async getProfile(): Promise<UserProfile> {
     const response = await api.get('/users/profile');
-    return response.data;
+    return response.data.data;
   }
 
   /**
    * 更新个人信息
    */
-  static async updateProfile(data: UpdateProfileRequest): Promise<ApiResponse<UserProfile>> {
+  static async updateProfile(data: UpdateProfileRequest): Promise<UserProfile> {
     const response = await api.put('/users/profile', data);
-    return response.data;
+    return response.data.data;
   }
 
   /**
    * 修改密码
    */
-  static async changePassword(data: ChangePasswordRequest): Promise<ApiResponse<void>> {
-    const response = await api.post('/users/change-password', data);
-    return response.data;
+  static async changePassword(data: ChangePasswordRequest): Promise<void> {
+    await api.post('/users/change-password', data);
   }
 
   /**
-   * 上传头像
+   * 上传用户头像
    */
-  static async uploadAvatar(file: File): Promise<ApiResponse<AvatarUploadResponse>> {
+  static async uploadAvatar(file: File): Promise<AvatarUploadResponse> {
     const formData = new FormData();
     formData.append('avatar', file);
     
     const response = await api.post('/users/avatar', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+        'Content-Type': 'multipart/form-data'
+      }
     });
-    return response.data;
+    return response.data.data;
   }
 
   /**
    * 获取用户偏好设置
    */
-  static async getPreferences(): Promise<ApiResponse<UserPreferences>> {
+  static async getPreferences(): Promise<UserPreferences> {
     const response = await api.get('/users/preferences');
-    return response.data;
+    return response.data.data;
   }
 
   /**
    * 更新用户偏好设置
    */
-  static async updatePreferences(data: UserPreferences): Promise<ApiResponse<UserPreferences>> {
+  static async updatePreferences(data: UserPreferences): Promise<UserPreferences> {
     const response = await api.put('/users/preferences', data);
-    return response.data;
+    return response.data.data;
   }
 
   /**
    * 获取用户统计信息
    */
-  static async getUserStats(): Promise<ApiResponse<{
+  static async getUserStats(): Promise<{
     documentCount: number;
     categoryCount: number;
     searchCount: number;
     lastLoginAt: string;
-  }>> {
+  }> {
     const response = await api.get('/users/stats');
-    return response.data;
+    return response.data.data;
   }
 
   /**
    * 删除用户账户
    */
-  static async deleteAccount(password: string): Promise<ApiResponse<void>> {
+  static async deleteAccount(password: string): Promise<void> {
     const response = await api.delete('/users/account', {
       data: { password }
     });
-    return response.data;
+    // 不需要返回数据，只需要确保操作成功
   }
 
   /**
@@ -144,7 +143,7 @@ export class UserService {
     pageSize?: number;
     startDate?: string;
     endDate?: string;
-  }): Promise<ApiResponse<{
+  }): Promise<{
     data: Array<{
       id: string;
       action: string;
@@ -156,9 +155,9 @@ export class UserService {
     total: number;
     page: number;
     pageSize: number;
-  }>> {
+  }> {
     const response = await api.get('/users/activity-logs', { params });
-    return response.data;
+    return response.data.data;
   }
 
   /**
@@ -168,33 +167,33 @@ export class UserService {
     const response = await api.get('/users/export', {
       responseType: 'blob'
     });
-    return response.data;
+    return response.data as unknown as Blob;
   }
 
   /**
    * 验证当前密码
    */
-  static async verifyPassword(password: string): Promise<ApiResponse<boolean>> {
+  static async verifyPassword(password: string): Promise<boolean> {
     const response = await api.post('/users/verify-password', { password });
-    return response.data;
+    return response.data.data;
   }
 
   /**
    * 启用/禁用两步验证
    */
-  static async toggleTwoFactorAuth(enabled: boolean): Promise<ApiResponse<{
+  static async toggleTwoFactorAuth(enabled: boolean): Promise<{
     enabled: boolean;
     qrCode?: string;
     backupCodes?: string[];
-  }>> {
+  }> {
     const response = await api.post('/users/two-factor-auth', { enabled });
-    return response.data;
+    return response.data.data;
   }
 
   /**
    * 获取用户会话列表
    */
-  static async getSessions(): Promise<ApiResponse<Array<{
+  static async getSessions(): Promise<Array<{
     id: string;
     deviceInfo: string;
     ipAddress: string;
@@ -202,25 +201,25 @@ export class UserService {
     isCurrent: boolean;
     lastActiveAt: string;
     createdAt: string;
-  }>>> {
+  }>> {
     const response = await api.get('/users/sessions');
-    return response.data;
+    return response.data.data;
   }
 
   /**
    * 终止指定会话
    */
-  static async terminateSession(sessionId: string): Promise<ApiResponse<void>> {
+  static async terminateSession(sessionId: string): Promise<void> {
     const response = await api.delete(`/users/sessions/${sessionId}`);
-    return response.data;
+    // 不需要返回数据，只需要确保操作成功
   }
 
   /**
    * 终止所有其他会话
    */
-  static async terminateAllOtherSessions(): Promise<ApiResponse<void>> {
+  static async terminateAllOtherSessions(): Promise<void> {
     const response = await api.delete('/users/sessions/others');
-    return response.data;
+    // 不需要返回数据，只需要确保操作成功
   }
 }
 

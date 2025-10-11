@@ -23,6 +23,9 @@ export interface Document {
   updated_at: string;
   description?: string;  // 文档描述，可选属性
   file_size?: number;    // 文件大小（字节），可选属性
+  file_name?: string;    // 文件名，可选属性
+  file_extension?: string; // 文件扩展名，可选属性
+  category_name?: string; // 分类名称，可选属性
 }
 
 // 文档上传请求接口
@@ -43,14 +46,17 @@ export interface DocumentUploadResponse {
 export interface DocumentUpdateRequest {
   title?: string;
   category_id?: string;
+  description?: string;
 }
 
 // 文档列表响应接口
 export interface DocumentListResponse {
-  success: boolean;
-  data: Document[];
+  success?: boolean;
+  data?: Document[];
   documents: Document[];  // 添加 documents 字段，与后端API一致
   total: number;
+  page?: number;
+  size?: number;
 }
 
 // 文档搜索参数接口

@@ -20,6 +20,8 @@ import {
   Alert,
   Tooltip,
   Tree,
+  Steps,
+  Result,
 } from 'antd';
 import {
   UploadOutlined,
@@ -30,6 +32,10 @@ import {
   SaveOutlined,
   FolderOutlined,
   FolderOpenOutlined,
+  CheckCircleOutlined,
+  EditOutlined,
+  InfoCircleOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
@@ -41,6 +47,7 @@ const { TextArea } = Input;
 const { Option } = Select;
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
+const { Step } = Steps;
 
 interface DocumentUploadForm {
   title: string;
@@ -67,7 +74,18 @@ export const DocumentUpload: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [selectedDirectory, setSelectedDirectory] = useState<string>('');
-  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>(['01_公司基本信息']);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadedDocument, setUploadedDocument] = useState<any>(null);
+
+  // 确保form实例在组件挂载后立即可用
+  useEffect(() => {
+    // 强制触发form实例的初始化
+    form.resetFields();
+  }, [form]);
+
+
 
   // 支持的文件类型
   const acceptedFileTypes = {
@@ -156,56 +174,54 @@ export const DocumentUpload: React.FC = () => {
           ],
         },
         {
-          key: '05_海外物联网业务/市场拓展部',
-          title: '市场拓展部',
-          icon: <FolderOutlined />,
-          children: [
-            { key: '05_海外物联网业务/市场拓展部/合作伙伴管理', title: '合作伙伴管理', icon: <FolderOutlined /> },
-            { key: '05_海外物联网业务/市场拓展部/市场推广策略', title: '市场推广策略', icon: <FolderOutlined /> },
-            { key: '05_海外物联网业务/市场拓展部/目标市场分析', title: '目标市场分析', icon: <FolderOutlined /> },
-            { key: '05_海外物联网业务/市场拓展部/竞争对手情报', title: '竞争对手情报', icon: <FolderOutlined /> },
-            { key: '05_海外物联网业务/市场拓展部/行业趋势研究', title: '行业趋势研究', icon: <FolderOutlined /> },
-          ],
-        },
-        {
           key: '05_海外物联网业务/技术研发中心',
           title: '技术研发中心',
           icon: <FolderOutlined />,
           children: [
-            { key: '05_海外物联网业务/技术研发中心/API接口文档', title: 'API接口文档', icon: <FolderOutlined /> },
-            { key: '05_海外物联网业务/技术研发中心/技术标准规范', title: '技术标准规范', icon: <FolderOutlined /> },
-            { key: '05_海外物联网业务/技术研发中心/技术白皮书', title: '技术白皮书', icon: <FolderOutlined /> },
+            { key: '05_海外物联网业务/技术研发中心/产品规格书', title: '产品规格书', icon: <FolderOutlined /> },
+            { key: '05_海外物联网业务/技术研发中心/技术标准文档', title: '技术标准文档', icon: <FolderOutlined /> },
+            { key: '05_海外物联网业务/技术研发中心/测试报告', title: '测试报告', icon: <FolderOutlined /> },
+            { key: '05_海外物联网业务/技术研发中心/研发流程规范', title: '研发流程规范', icon: <FolderOutlined /> },
             { key: '05_海外物联网业务/技术研发中心/硬件产品文档', title: '硬件产品文档', icon: <FolderOutlined /> },
             { key: '05_海外物联网业务/技术研发中心/软件系统文档', title: '软件系统文档', icon: <FolderOutlined /> },
           ],
         },
         {
-          key: '05_海外物联网业务/销售管理部',
-          title: '销售管理部',
+          key: '05_海外物联网业务/销售市场部',
+          title: '销售市场部',
           icon: <FolderOutlined />,
           children: [
-            { key: '05_海外物联网业务/销售管理部/合同范本库', title: '合同范本库', icon: <FolderOutlined /> },
-            { key: '05_海外物联网业务/销售管理部/报价模板库', title: '报价模板库', icon: <FolderOutlined /> },
-            { key: '05_海外物联网业务/销售管理部/销售培训资料', title: '销售培训资料', icon: <FolderOutlined /> },
-            { key: '05_海外物联网业务/销售管理部/销售数据分析', title: '销售数据分析', icon: <FolderOutlined /> },
-            { key: '05_海外物联网业务/销售管理部/销售流程规范', title: '销售流程规范', icon: <FolderOutlined /> },
+            { key: '05_海外物联网业务/销售市场部/产品宣传资料', title: '产品宣传资料', icon: <FolderOutlined /> },
+            { key: '05_海外物联网业务/销售市场部/合同模板', title: '合同模板', icon: <FolderOutlined /> },
+            { key: '05_海外物联网业务/销售市场部/客户资料管理', title: '客户资料管理', icon: <FolderOutlined /> },
+            { key: '05_海外物联网业务/销售市场部/市场分析报告', title: '市场分析报告', icon: <FolderOutlined /> },
+            { key: '05_海外物联网业务/销售市场部/销售流程规范', title: '销售流程规范', icon: <FolderOutlined /> },
           ],
         },
       ],
     },
     {
-      key: '06_政府信息化业务',
-      title: '06_政府信息化业务',
+      key: '06_国内智慧城市业务',
+      title: '06_国内智慧城市业务',
       icon: <FolderOutlined />,
       children: [
         {
-          key: '06_政府信息化业务/项目运营中心',
-          title: '项目运营中心',
+          key: '06_国内智慧城市业务/项目实施部',
+          title: '项目实施部',
           icon: <FolderOutlined />,
           children: [
-            { key: '06_政府信息化业务/项目运营中心/市场商务团队', title: '市场商务团队', icon: <FolderOutlined /> },
-            { key: '06_政府信息化业务/项目运营中心/质量成本团队', title: '质量成本团队', icon: <FolderOutlined /> },
-            { key: '06_政府信息化业务/项目运营中心/项目研发团队', title: '项目研发团队', icon: <FolderOutlined /> },
+            { key: '06_国内智慧城市业务/项目实施部/实施方案模板', title: '实施方案模板', icon: <FolderOutlined /> },
+            { key: '06_国内智慧城市业务/项目实施部/项目交付标准', title: '项目交付标准', icon: <FolderOutlined /> },
+            { key: '06_国内智慧城市业务/项目实施部/质量控制流程', title: '质量控制流程', icon: <FolderOutlined /> },
+          ],
+        },
+        {
+          key: '06_国内智慧城市业务/解决方案部',
+          title: '解决方案部',
+          icon: <FolderOutlined />,
+          children: [
+            { key: '06_国内智慧城市业务/解决方案部/技术方案库', title: '技术方案库', icon: <FolderOutlined /> },
+            { key: '06_国内智慧城市业务/解决方案部/行业解决方案', title: '行业解决方案', icon: <FolderOutlined /> },
           ],
         },
       ],
@@ -216,65 +232,37 @@ export const DocumentUpload: React.FC = () => {
       icon: <FolderOutlined />,
       children: [
         {
-          key: '07_保障性住房业务/政策合规部',
-          title: '政策合规部',
-          icon: <FolderOutlined />,
-          children: [
-            { key: '07_保障性住房业务/政策合规部/保障房政策库', title: '保障房政策库', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/政策合规部/审计合规要求', title: '审计合规要求', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/政策合规部/政府检查记录', title: '政府检查记录', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/政策合规部/政策风险预警', title: '政策风险预警', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/政策合规部/补贴申请流程', title: '补贴申请流程', icon: <FolderOutlined /> },
-          ],
-        },
-        {
           key: '07_保障性住房业务/物业管理部',
           title: '物业管理部',
           icon: <FolderOutlined />,
           children: [
-            { key: '07_保障性住房业务/物业管理部/安全管理规范', title: '安全管理规范', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/物业管理部/收费管理制度', title: '收费管理制度', icon: <FolderOutlined /> },
+            { key: '07_保障性住房业务/物业管理部/住户服务指南', title: '住户服务指南', icon: <FolderOutlined /> },
+            { key: '07_保障性住房业务/物业管理部/安全管理制度', title: '安全管理制度', icon: <FolderOutlined /> },
             { key: '07_保障性住房业务/物业管理部/物业服务标准', title: '物业服务标准', icon: <FolderOutlined /> },
             { key: '07_保障性住房业务/物业管理部/环境管理标准', title: '环境管理标准', icon: <FolderOutlined /> },
             { key: '07_保障性住房业务/物业管理部/维修维护手册', title: '维修维护手册', icon: <FolderOutlined /> },
           ],
         },
         {
-          key: '07_保障性住房业务/租户管理部',
-          title: '租户管理部',
+          key: '07_保障性住房业务/运营管理部',
+          title: '运营管理部',
           icon: <FolderOutlined />,
           children: [
-            { key: '07_保障性住房业务/租户管理部/投诉处理流程', title: '投诉处理流程', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/租户管理部/社区活动管理', title: '社区活动管理', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/租户管理部/租户信息档案', title: '租户信息档案', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/租户管理部/租户服务指南', title: '租户服务指南', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/租户管理部/租赁合同模板', title: '租赁合同模板', icon: <FolderOutlined /> },
-          ],
-        },
-        {
-          key: '07_保障性住房业务/项目建设部',
-          title: '项目建设部',
-          icon: <FolderOutlined />,
-          children: [
-            { key: '07_保障性住房业务/项目建设部/工程进度管理', title: '工程进度管理', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/项目建设部/施工图纸资料', title: '施工图纸资料', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/项目建设部/施工规范标准', title: '施工规范标准', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/项目建设部/规划设计文件', title: '规划设计文件', icon: <FolderOutlined /> },
-            { key: '07_保障性住房业务/项目建设部/质量验收记录', title: '质量验收记录', icon: <FolderOutlined /> },
+            { key: '07_保障性住房业务/运营管理部/入住管理流程', title: '入住管理流程', icon: <FolderOutlined /> },
+            { key: '07_保障性住房业务/运营管理部/租赁管理制度', title: '租赁管理制度', icon: <FolderOutlined /> },
+            { key: '07_保障性住房业务/运营管理部/费用管理规范', title: '费用管理规范', icon: <FolderOutlined /> },
           ],
         },
       ],
     },
     {
-      key: '08_技术研发中心',
-      title: '08_技术研发中心',
+      key: '08_投资发展中心',
+      title: '08_投资发展中心',
       icon: <FolderOutlined />,
       children: [
-        { key: '08_技术研发中心/创新项目库', title: '创新项目库', icon: <FolderOutlined /> },
-        { key: '08_技术研发中心/技术培训资料', title: '技术培训资料', icon: <FolderOutlined /> },
-        { key: '08_技术研发中心/技术架构规范', title: '技术架构规范', icon: <FolderOutlined /> },
-        { key: '08_技术研发中心/知识产权管理', title: '知识产权管理', icon: <FolderOutlined /> },
-        { key: '08_技术研发中心/研发流程管理', title: '研发流程管理', icon: <FolderOutlined /> },
+        { key: '08_投资发展中心/投资决策流程', title: '投资决策流程', icon: <FolderOutlined /> },
+        { key: '08_投资发展中心/项目评估标准', title: '项目评估标准', icon: <FolderOutlined /> },
+        { key: '08_投资发展中心/风险控制体系', title: '风险控制体系', icon: <FolderOutlined /> },
       ],
     },
     {
@@ -311,65 +299,39 @@ export const DocumentUpload: React.FC = () => {
         { key: '11_知识库管理规范/文档分类标准', title: '文档分类标准', icon: <FolderOutlined /> },
         { key: '11_知识库管理规范/权限管理体系', title: '权限管理体系', icon: <FolderOutlined /> },
         { key: '11_知识库管理规范/版本控制机制', title: '版本控制机制', icon: <FolderOutlined /> },
-        { key: '11_知识库管理规范/知识贡献激励', title: '知识贡献激励', icon: <FolderOutlined /> },
       ],
     },
   ];
 
-  // 获取目录路径
-  const getDirectoryPath = (key: string): string => {
-    return `/root/knowledge-base-app/company_knowledge_base/${key}`;
-  };
-
-  // 目录选择处理
-  const handleDirectorySelect = (selectedKeys: React.Key[]) => {
-    if (selectedKeys.length > 0) {
-      const selectedKey = selectedKeys[0] as string;
-      setSelectedDirectory(selectedKey);
-      form.setFieldValue('upload_directory', selectedKey);
-    }
-  };
-
   // 加载分类数据
-  const loadCategories = async () => {
-    try {
+  useEffect(() => {
+    const loadCategories = async () => {
       setLoadingCategories(true);
-      const response = await CategoryService.getCategoryTree();
-      const flatCategories = flattenCategories(response?.data || []);
-      setCategories(flatCategories);
-    } catch (error) {
-      message.error('加载分类数据失败');
-      console.error('Load categories error:', error);
-    } finally {
-      setLoadingCategories(false);
-    }
-  };
-
-  // 扁平化分类数据
-  const flattenCategories = (categories: Category[]): Category[] => {
-    const result: Category[] = [];
-    const flatten = (cats: Category[], level = 0) => {
-      if (!cats || !Array.isArray(cats)) {
-        return;
+      try {
+        const response = await CategoryService.getCategoryTree();
+        setCategories(response.data || []);
+      } catch (error) {
+        console.error('加载分类失败:', error);
+        message.error('加载分类失败');
+        setCategories([]);
+      } finally {
+        setLoadingCategories(false);
       }
-      cats.forEach(cat => {
-        result.push({ ...cat, level });
-        if (cat.children && Array.isArray(cat.children) && cat.children.length > 0) {
-          flatten(cat.children, level + 1);
-        }
-      });
     };
-    flatten(categories);
-    return result;
-  };
 
-  // 文件上传前的检查
+    loadCategories();
+  }, []);
+
+  // 文件上传前验证
   const beforeUpload = (file: File) => {
-    const isValidType = Object.keys(acceptedFileTypes).includes(file.type) ||
-      Object.values(acceptedFileTypes).flat().some(ext => file.name.toLowerCase().endsWith(ext));
+    const isValidType = Object.keys(acceptedFileTypes).some(type => 
+      file.type === type || acceptedFileTypes[type as keyof typeof acceptedFileTypes].some(ext => 
+        file.name.toLowerCase().endsWith(ext)
+      )
+    );
     
     if (!isValidType) {
-      message.error('不支持的文件格式！请上传 PDF、Word、Excel、PowerPoint、TXT、Markdown 或 CSV 文件');
+      message.error('不支持的文件格式！请选择支持的文件类型。');
       return false;
     }
 
@@ -382,69 +344,109 @@ export const DocumentUpload: React.FC = () => {
     return false; // 阻止自动上传
   };
 
-  // 文件列表变化处理
-  const handleFileChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
+  // 处理文件选择
+  const handleFileChange: UploadProps['onChange'] = (info) => {
+    console.log('文件选择变化:', info);
+    console.log('文件列表:', info.fileList);
     
-    // 如果添加了文件且标题为空，自动填充标题
-    if (newFileList.length > 0 && !form.getFieldValue('title')) {
-      const fileName = newFileList[0].name;
-      const titleWithoutExt = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
-      form.setFieldValue('title', titleWithoutExt);
+    // 正确处理文件对象，确保originFileObj存在
+    const processedFileList: UploadFile[] = info.fileList.map(file => {
+      // 如果文件没有originFileObj，但有其他文件属性，说明是新上传的文件
+      if (!file.originFileObj && file.status !== 'removed') {
+        console.log('处理文件对象:', file);
+        // 对于新上传的文件，file本身就是File对象
+        if (file instanceof File) {
+          return {
+            ...file,
+            uid: file.uid || `${Date.now()}-${Math.random()}`,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            originFileObj: file as any,
+            status: 'done' as const
+          };
+        }
+        // 如果file不是File对象但包含文件信息，可能需要从其他属性获取
+        else if (file.name && file.size !== undefined) {
+          console.warn('文件对象结构异常，尝试修复:', file);
+          // 尝试从file对象本身获取File实例
+          const fileObj = (file as any).originFileObj || (file as any).file || file;
+          if (fileObj instanceof File) {
+            return {
+              ...file,
+              originFileObj: fileObj as any,
+              status: 'done' as const
+            };
+          }
+        }
+      }
+      return file;
+    });
+    
+    console.log('处理后的文件列表:', processedFileList);
+    setFileList(processedFileList);
+    
+    if (processedFileList.length > 0 && currentStep === 0) {
+      setCurrentStep(1);
+      // 自动填充文档标题
+      const fileName = processedFileList[0].name;
+      const titleWithoutExt = fileName.replace(/\.[^/.]+$/, "");
+      form.setFieldsValue({ title: titleWithoutExt });
+    } else if (processedFileList.length === 0 && currentStep > 0) {
+      setCurrentStep(0);
     }
   };
 
-  // 移除文件
-  const handleRemoveFile = (file: UploadFile) => {
-    const newFileList = fileList.filter(item => item.uid !== file.uid);
-    setFileList(newFileList);
-  };
-
-  // 获取文件类型图标
-  const getFileIcon = (fileName: string) => {
-    const ext = fileName.toLowerCase().split('.').pop();
-    switch (ext) {
-      case 'pdf':
-        return <FileTextOutlined style={{ color: '#ff4d4f' }} />;
-      case 'doc':
-      case 'docx':
-        return <FileTextOutlined style={{ color: '#1890ff' }} />;
-      case 'xls':
-      case 'xlsx':
-        return <FileTextOutlined style={{ color: '#52c41a' }} />;
-      case 'ppt':
-      case 'pptx':
-        return <FileTextOutlined style={{ color: '#fa8c16' }} />;
-      default:
-        return <FileTextOutlined />;
+  // 处理目录选择
+  const handleDirectorySelect = (selectedKeys: React.Key[], info: any) => {
+    if (selectedKeys.length > 0) {
+      const selectedKey = selectedKeys[0] as string;
+      setSelectedDirectory(selectedKey);
+      form.setFieldsValue({ upload_directory: selectedKey });
+      if (currentStep === 1) {
+        setCurrentStep(2);
+      }
     }
   };
 
-  // 格式化文件大小
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  // 处理重置
+  const handleReset = () => {
+    form.resetFields();
+    setFileList([]);
+    setSelectedDirectory('');
+    setCurrentStep(0);
+    setUploadProgress(0);
+    setUploadSuccess(false);
+    setUploadedDocument(null);
   };
 
-  // 提交表单
+  // 处理表单提交
   const handleSubmit = async (values: DocumentUploadForm) => {
+    console.log('开始提交表单:', values);
+    console.log('文件列表:', fileList);
+    
     if (fileList.length === 0) {
       message.error('请选择要上传的文件');
       return;
     }
 
-    if (!selectedDirectory) {
+    if (!values.upload_directory) {
       message.error('请选择上传目录');
       return;
     }
 
-    try {
-      setUploading(true);
-      setUploadProgress(0);
+    setUploading(true);
+    setUploadProgress(0);
 
+    try {
+      const file = fileList[0];
+      console.log('准备上传文件:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        originFileObj: file.originFileObj
+      });
+      
       // 模拟上传进度
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => {
@@ -456,263 +458,428 @@ export const DocumentUpload: React.FC = () => {
         });
       }, 200);
 
-      const file = fileList[0];
+      // 调用上传API
+      console.log('调用DocumentService.uploadDocument...');
+      
+      // 确保文件对象存在
+      if (!file.originFileObj) {
+        throw new Error('文件对象不存在');
+      }
+      
       const response = await DocumentService.uploadDocument(
         file.originFileObj as File,
         values.title,
         values.description || '',
         values.category_id || '',
-        selectedDirectory
+        values.upload_directory
       );
-
+      
+      console.log('上传响应:', response);
       clearInterval(progressInterval);
       setUploadProgress(100);
-
-      if (response.success) {
-        message.success(`文档上传成功！存储路径：${getDirectoryPath(selectedDirectory)}`);
-        setTimeout(() => {
-          navigate('/documents');
-        }, 2000);
+      
+      if (response && response.success) {
+        setUploadSuccess(true);
+        setUploadedDocument(response.document);
+        message.success('文档上传成功！');
+        setCurrentStep(2); // 移动到成功步骤
       } else {
-        throw new Error(response.message || '上传失败');
+        throw new Error(response?.message || '上传失败');
       }
-    } catch (error) {
-      message.error('文档上传失败，请重试');
-      console.error('Upload error:', error);
+
+    } catch (error: any) {
+      console.error('上传失败:', error);
+      console.error('错误详情:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response
+      });
+      
       setUploadProgress(0);
+      
+      const errorMessage = error.message || '文档上传失败，请重试';
+      message.error(errorMessage);
+      setUploadSuccess(false);
     } finally {
       setUploading(false);
     }
   };
 
-  // 重置表单
-  const handleReset = () => {
-    form.resetFields();
-    setFileList([]);
-    setUploadProgress(0);
-    setSelectedDirectory('');
-  };
+  // 步骤配置
+  const steps = [
+    {
+      title: '选择文件',
+      icon: <InboxOutlined />,
+      description: '选择要上传的文档文件',
+    },
+    {
+      title: '选择目录',
+      icon: <FolderOutlined />,
+      description: '选择文档存储目录',
+    },
+    {
+      title: '填写信息',
+      icon: <EditOutlined />,
+      description: '填写文档基本信息',
+    },
+  ];
 
-  // 组件挂载时加载分类
-  useEffect(() => {
-    loadCategories();
-  }, []);
+  // 如果上传成功，显示成功页面
+  if (uploadSuccess) {
+    return (
+      <div className="document-upload-container p-6">
+        <div className="max-w-4xl mx-auto">
+          <Result
+            status="success"
+            title="文档上传成功！"
+            subTitle={`文档"${uploadedDocument?.title || '未知文档'}"已成功上传到知识库`}
+            extra={[
+              <Button type="primary" key="view" onClick={() => navigate('/documents')}>
+                查看文档列表
+              </Button>,
+              <Button key="upload-again" onClick={handleReset}>
+                继续上传
+              </Button>,
+            ]}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="document-upload-page p-6">
-      <Title level={2} className="mb-6" data-testid="page-title">
-        文档上传
-      </Title>
+    <div className="document-upload-container p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-6">
+          <Title level={2}>
+            <FileTextOutlined className="mr-2" />
+            文档上传
+          </Title>
+          <Text type="secondary">
+            按照以下步骤完成文档上传：选择文件 → 选择目录 → 填写信息 → 确认上传
+          </Text>
+        </div>
 
-      <Row gutter={[24, 24]}>
-        <Col xs={24} lg={12}>
-          <Card title="文档信息" className="mb-6" data-testid="document-info-card">
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={handleSubmit}
-              className="document-upload-form"
-              data-testid="document-upload-form"
-            >
-              <Form.Item
-                label="文档标题"
-                name="title"
-                rules={[
-                  { required: true, message: '请输入文档标题' },
-                  { min: 2, message: '标题至少2个字符' },
-                  { max: 100, message: '标题不能超过100个字符' }
-                ]}
-              >
-                <Input
-                  placeholder="请输入文档标题"
-                  maxLength={100}
-                  showCount
-                  data-testid="title-input"
-                />
-              </Form.Item>
+        {/* 步骤指示器 */}
+        <Card className="mb-6">
+          <Steps current={currentStep} items={steps} />
+        </Card>
 
-              <Form.Item
-                label="文档描述"
-                name="description"
-                rules={[
-                  { max: 500, message: '描述不能超过500个字符' }
-                ]}
-              >
-                <TextArea
-                  placeholder="请输入文档描述（可选）"
-                  rows={4}
-                  maxLength={500}
-                  showCount
-                  data-testid="description-input"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="文档分类"
-                name="category_id"
-                rules={[
-                  { required: false, message: '请选择文档分类' }
-                ]}
-              >
-                <Select
-                  placeholder="请选择文档分类（可选）"
-                  loading={loadingCategories}
-                  allowClear
-                  data-testid="category-select"
-                >
-                  {categories.map(category => (
-                    <Option key={category.id} value={category.id}>
-                      {category.name}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-
-              {selectedDirectory && (
-                <Alert
-                  message={`已选择目录: ${getDirectoryPath(selectedDirectory)}`}
-                  type="info"
-                  showIcon
-                  className="mb-4"
-                  data-testid="selected-directory-alert"
-                />
-              )}
-
-              <Form.Item>
-                <Space>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={uploading}
-                    disabled={fileList.length === 0 || !selectedDirectory}
-                    icon={<SaveOutlined />}
-                    className="upload-button"
-                    data-testid="upload-button"
-                  >
-                    {uploading ? '上传中...' : '上传文档'}
-                  </Button>
-                  <Button 
-                    onClick={handleReset} 
-                    disabled={uploading}
-                    className="reset-button"
-                    data-testid="reset-button"
-                  >
-                    重置
-                  </Button>
-                  <Button 
-                    onClick={() => navigate('/documents')}
-                    className="back-button"
-                    data-testid="back-button"
-                  >
-                    返回文档列表
-                  </Button>
-                </Space>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-
-        <Col xs={24} lg={6}>
-          <Card title="选择上传目录" className="mb-6">
-            <Tree
-              treeData={directoryTreeData}
-              onSelect={handleDirectorySelect}
-              selectedKeys={selectedDirectory ? [selectedDirectory] : []}
-              expandedKeys={expandedKeys}
-              onExpand={setExpandedKeys}
-              showIcon
-              height={400}
-              style={{ overflow: 'auto' }}
-              className="directory-tree"
-              data-testid="directory-tree"
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} lg={6}>
-          <Card title="文件上传" className="mb-6">
-            <Dragger
-              fileList={fileList}
-              onChange={handleFileChange}
-              beforeUpload={beforeUpload}
-              maxCount={1}
-              accept={acceptString}
-              disabled={uploading}
-              className="file-dragger"
-              data-testid="file-dragger"
-            >
-              <p className="ant-upload-drag-icon">
-                <InboxOutlined />
-              </p>
-              <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
-              <p className="ant-upload-hint">
-                支持单个文件上传，文件大小不超过 10MB
-              </p>
-            </Dragger>
-
-            {uploading && uploadProgress > 0 && (
-              <div className="mt-4">
-                <Progress percent={uploadProgress} status="active" />
-                <Text type="secondary" className="text-sm">
-                  正在上传文档...
-                </Text>
-              </div>
-            )}
-          </Card>
-
-          {fileList.length > 0 && (
-            <Card title="已选文件" size="small" className="mb-6">
-              {fileList.map(file => (
-                <div key={file.uid} className="flex items-center justify-between p-2 border rounded mb-2">
-                  <div className="flex items-center space-x-2 flex-1">
-                    {getFileIcon(file.name)}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{file.name}</div>
-                      <div className="text-xs text-gray-500">
-                        {formatFileSize(file.size || 0)}
-                      </div>
-                    </div>
-                  </div>
-                  <Tooltip title="移除文件">
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={<DeleteOutlined />}
-                      onClick={() => handleRemoveFile(file)}
-                      disabled={uploading}
-                    />
-                  </Tooltip>
-                </div>
-              ))}
-            </Card>
-          )}
-
-          <Card title="支持格式" size="small">
-            <div className="space-y-2">
-              <div>
-                <Tag color="red">PDF</Tag>
-                <Text type="secondary" className="text-sm">便携式文档格式</Text>
-              </div>
-              <div>
-                <Tag color="blue">Word</Tag>
-                <Text type="secondary" className="text-sm">DOC, DOCX</Text>
-              </div>
-              <div>
-                <Tag color="green">Excel</Tag>
-                <Text type="secondary" className="text-sm">XLS, XLSX</Text>
-              </div>
-              <div>
-                <Tag color="orange">PowerPoint</Tag>
-                <Text type="secondary" className="text-sm">PPT, PPTX</Text>
-              </div>
-              <div>
-                <Tag color="purple">文本</Tag>
-                <Text type="secondary" className="text-sm">TXT, MD, CSV</Text>
-              </div>
+        {/* 操作提示 */}
+        <Alert
+          message="上传提示"
+          description={
+            <div>
+              <p>• 支持的文件格式：PDF、Word、Excel、PowerPoint、TXT、Markdown、CSV</p>
+              <p>• 单个文件大小不超过 10MB</p>
+              <p>• 建议为文档选择合适的分类和目录，便于后续管理和检索</p>
             </div>
-          </Card>
-        </Col>
-      </Row>
+          }
+          type="info"
+          showIcon
+          icon={<InfoCircleOutlined />}
+          className="mb-6"
+        />
+
+        <Row gutter={24}>
+          {/* 左侧：文件上传和目录选择 */}
+          <Col xs={24} lg={14}>
+            {/* 第一步：文件上传 */}
+            <Card 
+              title={
+                <Space>
+                  <InboxOutlined />
+                  <span>第一步：选择文件</span>
+                  {fileList.length > 0 && <CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                </Space>
+              } 
+              className="mb-6"
+              style={{ 
+                border: currentStep === 0 ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                backgroundColor: fileList.length > 0 ? '#f6ffed' : 'white'
+              }}
+            >
+              <Dragger
+                fileList={fileList}
+                onChange={handleFileChange}
+                beforeUpload={beforeUpload}
+                maxCount={1}
+                accept={acceptString}
+                disabled={uploading}
+                className="file-dragger"
+                data-testid="file-dragger"
+                customRequest={({ file, onSuccess }) => {
+                  // 自定义上传请求，阻止默认上传行为
+                  console.log('自定义上传请求:', file);
+                  console.log('文件类型:', typeof file);
+                  console.log('文件属性:', Object.keys(file));
+                  
+                  // 确保文件对象正确设置
+                  const uploadFile = {
+                    uid: Date.now().toString(),
+                    name: (file as File).name,
+                    size: (file as File).size,
+                    type: (file as File).type,
+                    originFileObj: file as File,
+                    status: 'done' as const
+                  };
+                  
+                  console.log('处理后的文件对象:', uploadFile);
+                  
+                  // 立即调用成功回调，但不实际上传
+                  setTimeout(() => {
+                    onSuccess?.(uploadFile);
+                  }, 0);
+                }}
+              >
+                <p className="ant-upload-drag-icon">
+                  <InboxOutlined />
+                </p>
+                <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
+                <p className="ant-upload-hint">
+                  支持单个文件上传，文件大小不超过 10MB
+                </p>
+              </Dragger>
+
+              {/* 支持的文件格式提示 */}
+              <div className="mt-4">
+                <Text type="secondary" className="text-sm">
+                  支持的文件格式：
+                </Text>
+                <div className="mt-2">
+                  {Object.values(acceptedFileTypes).flat().map(ext => (
+                    <Tag key={ext} color="blue" className="mb-1">
+                      {ext}
+                    </Tag>
+                  ))}
+                </div>
+              </div>
+
+              {/* 已选文件显示 */}
+              {fileList.length > 0 && (
+                <div className="mt-4">
+                  <Alert
+                    message="已选择文件"
+                    description={
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <FileTextOutlined />
+                          <span>{fileList[0].name}</span>
+                          <Tag color="green">
+                            {(fileList[0].size! / 1024 / 1024).toFixed(2)} MB
+                          </Tag>
+                        </div>
+                        <Button
+                          type="text"
+                          icon={<DeleteOutlined />}
+                          onClick={() => {
+                            setFileList([]);
+                            setCurrentStep(0);
+                          }}
+                          disabled={uploading}
+                        >
+                          移除
+                        </Button>
+                      </div>
+                    }
+                    type="success"
+                    showIcon
+                  />
+                </div>
+              )}
+            </Card>
+
+            {/* 第二步：目录选择 */}
+            <Card 
+              title={
+                <Space>
+                  <FolderOutlined />
+                  <span>第二步：选择目录</span>
+                  {selectedDirectory && <CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                </Space>
+              } 
+              className="mb-6"
+              style={{ 
+                border: currentStep === 1 ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                backgroundColor: selectedDirectory ? '#f6ffed' : 'white',
+                opacity: fileList.length === 0 ? 0.6 : 1
+              }}
+            >
+              {fileList.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <ExclamationCircleOutlined className="text-2xl mb-2" />
+                  <p>请先选择要上传的文件</p>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-4">
+                    <Text type="secondary">
+                      选择文档存储的目录位置，建议根据文档类型选择合适的分类目录
+                    </Text>
+                  </div>
+                  <Tree
+                    showLine
+                    showIcon
+                    defaultExpandedKeys={['01_公司基本信息']}
+                    expandedKeys={expandedKeys}
+                    onExpand={setExpandedKeys}
+                    onSelect={handleDirectorySelect}
+                    treeData={directoryTreeData}
+                    className="directory-tree"
+                    data-testid="directory-tree"
+                  />
+                  {selectedDirectory && (
+                    <div className="mt-4">
+                      <Alert
+                        message="已选择目录"
+                        description={
+                          <div className="flex items-center space-x-2">
+                            <FolderOpenOutlined />
+                            <span>{selectedDirectory}</span>
+                          </div>
+                        }
+                        type="success"
+                        showIcon
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </Card>
+          </Col>
+
+          {/* 右侧：文档信息表单 */}
+          <Col xs={24} lg={10}>
+            <Card 
+              title={
+                <Space>
+                  <EditOutlined />
+                  <span>第三步：填写信息</span>
+                  {currentStep >= 2 && <CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                </Space>
+              }
+              style={{ 
+                border: currentStep === 2 ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                opacity: !fileList.length || !selectedDirectory ? 0.6 : 1
+              }}
+            >
+              {!fileList.length || !selectedDirectory ? (
+                <div className="text-center py-8 text-gray-400">
+                  <ExclamationCircleOutlined className="text-2xl mb-2" />
+                  <p>请先完成文件选择和目录选择</p>
+                </div>
+              ) : (
+                <Form
+                  form={form}
+                  layout="vertical"
+                  onFinish={handleSubmit}
+                  disabled={uploading}
+                  data-testid="document-upload-form"
+                >
+                  <Form.Item name="upload_directory" hidden>
+                    <Input />
+                  </Form.Item>
+                  <Form.Item
+                    label="文档标题"
+                    name="title"
+                    rules={[
+                      { required: true, message: '请输入文档标题' },
+                      { max: 100, message: '标题长度不能超过100个字符' }
+                    ]}
+                  >
+                    <Input
+                      placeholder="请输入文档标题"
+                      maxLength={100}
+                      showCount
+                      data-testid="title-input"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="文档描述"
+                    name="description"
+                    rules={[
+                      { max: 500, message: '描述长度不能超过500个字符' }
+                    ]}
+                  >
+                    <TextArea
+                      placeholder="请输入文档描述（可选）"
+                      rows={4}
+                      maxLength={500}
+                      showCount
+                      data-testid="description-input"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="文档分类"
+                    name="category_id"
+                    rules={[
+                      { required: false, message: '请选择文档分类' }
+                    ]}
+                  >
+                    <Select
+                      placeholder="请选择文档分类（可选）"
+                      loading={loadingCategories}
+                      allowClear
+                      data-testid="category-select"
+                    >
+                      {categories.map(category => (
+                        <Option key={category.id} value={category.id}>
+                          {category.name}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+
+                  {/* 上传进度 */}
+                  {uploading && uploadProgress > 0 && (
+                    <div className="mb-4">
+                      <Progress percent={uploadProgress} status="active" />
+                      <Text type="secondary" className="text-sm">
+                        正在上传文档...
+                      </Text>
+                    </div>
+                  )}
+
+                  {/* 操作按钮 */}
+                  <Form.Item>
+                    <Space>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={uploading}
+                        disabled={!fileList.length || !selectedDirectory}
+                        icon={<SaveOutlined />}
+                        size="large"
+                        data-testid="upload-button"
+                      >
+                        {uploading ? '上传中...' : '上传文档'}
+                      </Button>
+                      <Button
+                        onClick={handleReset}
+                        disabled={uploading}
+                        size="large"
+                        data-testid="reset-button"
+                      >
+                        重置
+                      </Button>
+                      <Button
+                        onClick={() => navigate('/documents')}
+                        disabled={uploading}
+                        size="large"
+                        data-testid="cancel-button"
+                      >
+                        取消
+                      </Button>
+                    </Space>
+                  </Form.Item>
+                </Form>
+              )}
+            </Card>
+          </Col>
+        </Row>
+      </div>
     </div>
   );
 };

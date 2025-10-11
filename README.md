@@ -133,6 +133,35 @@ knowledge-base-app/
 - Docker & Docker Compose
 - Git
 
+### 端口配置管理
+
+项目采用集中式端口配置管理，所有服务端口统一在 `config/ports.yml` 文件中配置：
+
+```bash
+# 查看当前端口配置
+python3 scripts/manage_ports.py show
+
+# 更新端口配置（例如更新后端端口）
+python3 scripts/manage_ports.py update backend 5001
+
+# 验证端口配置
+python3 scripts/manage_ports.py validate
+
+# 生成配置文件（Docker Compose和前端环境变量）
+python3 scripts/manage_ports.py generate
+```
+
+端口配置文件位置：`config/ports.yml`
+
+主要特性：
+- ✅ 集中式端口配置管理
+- ✅ 自动生成Docker Compose配置
+- ✅ 自动生成前端环境变量
+- ✅ 端口冲突检测和验证
+- ✅ 支持动态端口更新
+
+详细文档请参考：[端口配置管理文档](./PORT_CONFIG_README.md)
+
 ### 1. 克隆项目
 
 ```bash
@@ -271,7 +300,7 @@ pnpm build
 
 ```bash
 # 测试API端点
-curl http://localhost:5000/api/health
+curl http://localhost:5000/health
 
 # 预期响应
 {"status": "healthy", "service": "knowledge-base-api"}
@@ -373,13 +402,23 @@ python -m pdb main.py
 
 ### Q1: 端口冲突
 
-```bash
-# 检查端口占用
-netstat -tulpn | grep :5000
+项目使用集中式端口配置管理，端口冲突问题可以通过以下方式解决：
 
-# 修改端口配置
-echo "PORT=5001" >> .env
+```bash
+# 检查端口配置和冲突
+python3 scripts/manage_ports.py validate
+
+# 查看当前端口配置
+python3 scripts/manage_ports.py show
+
+# 修改端口配置（例如更新后端端口）
+python3 scripts/manage_ports.py update backend 5001
+
+# 生成新的配置文件
+python3 scripts/manage_ports.py generate
 ```
+
+端口配置管理工具会自动检测端口冲突，如果多个服务使用相同的端口，会提示错误信息。
 
 ### Q2: 数据库连接失败
 
@@ -419,13 +458,16 @@ npm install --force
 git clone https://github.com/your-username/Data-Fabric.git
 cd Data-Fabric
 
+# 查看端口配置（可选）
+python3 scripts/manage_ports.py show
+
 # 启动所有服务
 ./start.sh
 
-# 访问应用
-# 前端: http://localhost:3000
-# 后端API: http://localhost:5000
-# Grafana监控: http://localhost:3001
+# 访问应用（端口配置见 config/ports.yml）
+# 前端: http://localhost:3000（默认）
+# 后端API: http://localhost:5000（默认）
+# Grafana监控: http://localhost:3001（默认）
 ```
 
 ### 开发模式
@@ -439,6 +481,135 @@ cd Data-Fabric
 
 # 停止服务
 ./stop.sh
+```
+
+## 🛠️ 部署和启动方法
+
+### 快速启动脚本
+
+项目提供了完整的启动脚本体系，支持快速部署和开发环境搭建：
+
+- **`start.sh`** - 主启动脚本，包含环境检查、服务启动和状态监控
+- **`stop.sh`** - 停止所有服务
+- **`status.sh`** - 检查服务运行状态
+
+### 开发环境启动
+
+使用开发脚本快速启动完整开发环境：
+
+```bash
+# 一键启动开发环境
+./scripts/dev/start_dev.sh
+
+# 该脚本包含以下步骤：
+# 1. 环境检查（验证docker、node、python3等命令）
+# 2. 启动基础设施服务（PostgreSQL、Redis、NebulaGraph）
+# 3. 激活Python虚拟环境
+# 4. 启动后端API服务
+# 5. 启动前端开发服务器
+```
+
+### 容器化部署
+
+项目使用Docker Compose进行容器化部署，支持以下服务：
+
+#### 核心服务
+- **后端API服务** - Flask应用，端口配置见 `config/ports.yml`
+- **前端服务** - React应用，端口配置见 `config/ports.yml`
+- **PostgreSQL数据库** - 主数据库，端口配置见 `config/ports.yml`
+- **Redis缓存** - 缓存服务，端口配置见 `config/ports.yml`
+- **NebulaGraph图数据库** - 图数据存储，端口配置见 `config/ports.yml`
+
+#### 监控服务
+- **Prometheus** - 监控数据收集，端口配置见 `config/ports.yml`
+- **Grafana** - 数据可视化，端口配置见 `config/ports.yml`
+- **Elasticsearch** - 日志存储，端口配置见 `config/ports.yml`
+
+#### 服务端口映射
+所有服务端口均通过集中式配置管理，具体端口映射请查看当前端口配置：
+
+```bash
+# 查看当前端口配置
+python3 scripts/manage_ports.py show
+
+# 默认端口映射（可通过配置修改）
+# 前端应用: http://localhost:3000
+# 后端API: http://localhost:5000
+# Grafana监控: http://localhost:3001
+# Prometheus: http://localhost:9090
+# PostgreSQL: localhost:5432
+# Redis: localhost:6379
+# NebulaGraph: localhost:9669
+```
+
+### 开发脚本
+
+项目包含完整的开发脚本体系：
+
+#### 开发脚本目录结构
+```
+scripts/
+├── dev/           # 开发环境脚本
+│   ├── start_dev.sh    # 开发环境启动
+│   ├── setup.sh        # 环境设置
+│   └── logs.sh         # 日志查看
+├── build/         # 构建脚本
+├── deploy/        # 部署脚本
+└── test/          # 测试脚本
+```
+
+#### 常用开发命令
+```bash
+# 启动开发环境
+./scripts/dev/start_dev.sh
+
+# 停止服务
+./stop.sh
+
+# 检查服务状态
+./status.sh
+
+# 查看日志
+./scripts/dev/logs.sh
+
+# 运行测试
+./scripts/test/run-tests.sh
+```
+
+### 环境配置
+
+项目使用环境变量进行配置管理：
+
+#### 后端环境变量 (.env)
+```bash
+# 数据库配置（端口配置见 config/ports.yml）
+DATABASE_URL=postgresql://user:pass@localhost:5432/knowledge_base
+REDIS_URL=redis://localhost:6379/0
+NEBULA_GRAPH_URL=localhost:9669
+
+# 应用配置
+FLASK_ENV=development
+SECRET_KEY=your-secret-key
+DEBUG=True
+```
+
+#### 前端环境变量 (.env)
+前端环境变量通过端口配置管理工具自动生成：
+
+```bash
+# 生成前端环境变量配置
+python3 scripts/manage_ports.py generate
+```
+
+生成的文件包含：
+```bash
+# API配置（端口自动配置）
+VITE_API_BASE_URL=http://localhost:5000/api
+VITE_GRAPHQL_URL=http://localhost:5000/graphql
+
+# 应用配置
+VITE_APP_TITLE=Data-Fabric
+VITE_APP_VERSION=1.0.0
 ```
 
 ## 📖 文档

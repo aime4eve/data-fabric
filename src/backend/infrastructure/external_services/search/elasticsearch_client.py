@@ -27,7 +27,8 @@ class ElasticsearchClient:
                 [{'host': self.host, 'port': self.port, 'scheme': 'http'}],
                 timeout=30,
                 max_retries=10,
-                retry_on_timeout=True
+                retry_on_timeout=True,
+                verify_certs=False
             )
             
             # 测试连接
