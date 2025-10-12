@@ -85,7 +85,7 @@ command_exists() {
 
 # 检查是否是首次运行
 is_first_run() {
-    if [ ! -f ".first_run_complete" ]; then
+    if [ ! -f "logs/.first_run_complete" ]; then
         return 0  # 首次运行
     else
         return 1  # 非首次运行
@@ -94,7 +94,7 @@ is_first_run() {
 
 # 标记首次运行完成
 mark_first_run_complete() {
-    touch ".first_run_complete"
+    touch "logs/.first_run_complete"
     echo -e "${GREEN}✅ 首次运行设置完成${NC}"
 }
 
@@ -361,6 +361,52 @@ show_status() {
     echo -e "${CYAN}🚀 系统已就绪，开始使用吧！${NC}"
 }
 
+# 检查是否有服务在运行
+check_existing_services() {
+    echo -e "${BLUE}🔍 检查现有服务状态...${NC}"
+    
+    EXISTING_SERVICES=0
+    
+    # 检查前端服务
+    if [ -f "logs/frontend.pid" ]; then
+        FRONTEND_PID=$(cat logs/frontend.pid)
+        if ps -p $FRONTEND_PID > /dev/null 2>&1; then
+            echo -e "${YELLOW}⚠️  前端服务已在运行 (PID: $FRONTEND_PID)，请先停止服务${NC}"
+            EXISTING_SERVICES=$((EXISTING_SERVICES + 1))
+        else
+            echo -e "${YELLOW}⚠️  前端服务PID文件存在但进程未运行，清理PID文件${NC}"
+            rm -f logs/frontend.pid
+        fi
+    fi
+    
+    # 检查后端服务
+    if [ -f "logs/backend.pid" ]; then
+        BACKEND_PID=$(cat logs/backend.pid)
+        if ps -p $BACKEND_PID > /dev/null 2>&1; then
+            echo -e "${YELLOW}⚠️  后端服务已在运行 (PID: $BACKEND_PID)，请先停止服务${NC}"
+            EXISTING_SERVICES=$((EXISTING_SERVICES + 1))
+        else
+            echo -e "${YELLOW}⚠️  后端服务PID文件存在但进程未运行，清理PID文件${NC}"
+            rm -f logs/backend.pid
+        fi
+    fi
+    
+    # 检查基础设施服务
+    if command -v docker-compose > /dev/null 2>&1 && [ -f "docker-compose.yml" ]; then
+        if docker-compose ps | grep -q "Up"; then
+            echo -e "${YELLOW}⚠️  基础设施服务已在运行，请先停止服务${NC}"
+            EXISTING_SERVICES=$((EXISTING_SERVICES + 1))
+        fi
+    fi
+    
+    if [ $EXISTING_SERVICES -gt 0 ]; then
+        echo -e "${RED}❌ 检测到 $EXISTING_SERVICES 个服务正在运行，请先运行 ./scripts/dev/stop_dev.sh 停止服务${NC}"
+        exit 1
+    fi
+    
+    echo -e "${GREEN}✅ 无现有服务运行，可以启动新服务${NC}"
+}
+
 # 主启动流程
 main() {
     echo -e "${BLUE}🔍 检查系统环境...${NC}"
@@ -376,6 +422,9 @@ main() {
     echo -e "${BLUE}🔍 检查端口占用...${NC}"
     check_port 3000 "前端服务" || exit 1
     check_port 5000 "后端API" || exit 1
+    
+    # 检查是否有服务在运行
+    check_existing_services
     
     # 检查是否是首次运行
     if is_first_run; then

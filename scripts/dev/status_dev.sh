@@ -50,12 +50,30 @@ check_frontend_status() {
             
             return 0
         else
-            echo -e "${RED}❌ 前端服务: 进程不存在 (PID文件: $FRONTEND_PID)${NC}"
-            return 1
+            echo -e "${YELLOW}⚠️  前端服务: PID文件存在但进程不存在 (PID: $FRONTEND_PID)${NC}"
+            echo -e "${BLUE}   🔍 尝试通过端口检查确认服务状态...${NC}"
+            
+            # 通过端口检查确认服务是否在运行
+            if curl -s http://localhost:3000 > /dev/null 2>&1; then
+                echo -e "${GREEN}   ✅ 端口 3000 可访问，服务实际在运行${NC}"
+                echo -e "${YELLOW}   ⚠️  PID文件可能已过期，建议清理${NC}"
+                return 0
+            else
+                echo -e "${RED}   ❌ 端口 3000 不可访问，服务确实未运行${NC}"
+                return 1
+            fi
         fi
     else
         echo -e "${YELLOW}⚠️  前端服务: 未启动 (PID文件不存在)${NC}"
-        return 2
+        
+        # 即使没有PID文件，也检查端口确认
+        if curl -s http://localhost:3000 > /dev/null 2>&1; then
+            echo -e "${GREEN}   ✅ 端口 3000 可访问，服务在运行但PID文件缺失${NC}"
+            return 0
+        else
+            echo -e "${RED}   ❌ 端口 3000 不可访问，确认服务未运行${NC}"
+            return 2
+        fi
     fi
 }
 
@@ -91,12 +109,30 @@ check_backend_status() {
             
             return 0
         else
-            echo -e "${RED}❌ 后端服务: 进程不存在 (PID文件: $BACKEND_PID)${NC}"
-            return 1
+            echo -e "${YELLOW}⚠️  后端服务: PID文件存在但进程不存在 (PID: $BACKEND_PID)${NC}"
+            echo -e "${BLUE}   🔍 尝试通过端口检查确认服务状态...${NC}"
+            
+            # 通过端口检查确认服务是否在运行
+            if curl -s http://localhost:5000/health > /dev/null 2>&1; then
+                echo -e "${GREEN}   ✅ 端口 5000 健康检查通过，服务实际在运行${NC}"
+                echo -e "${YELLOW}   ⚠️  PID文件可能已过期，建议清理${NC}"
+                return 0
+            else
+                echo -e "${RED}   ❌ 端口 5000 健康检查失败，服务确实未运行${NC}"
+                return 1
+            fi
         fi
     else
         echo -e "${YELLOW}⚠️  后端服务: 未启动 (PID文件不存在)${NC}"
-        return 2
+        
+        # 即使没有PID文件，也检查端口确认
+        if curl -s http://localhost:5000/health > /dev/null 2>&1; then
+            echo -e "${GREEN}   ✅ 端口 5000 健康检查通过，服务在运行但PID文件缺失${NC}"
+            return 0
+        else
+            echo -e "${RED}   ❌ 端口 5000 健康检查失败，确认服务未运行${NC}"
+            return 2
+        fi
     fi
 }
 
@@ -107,12 +143,31 @@ check_infrastructure_status() {
     if command -v docker-compose > /dev/null 2>&1 && [ -f "docker-compose.yml" ]; then
         echo -e "${BLUE}🔍 检查Docker服务状态...${NC}"
         
-        if docker-compose ps | grep -q "Up"; then
-            echo -e "${GREEN}✅ 基础设施服务: 运行中${NC}"
+        # 检查是否有服务定义
+        if docker-compose ps --services 2>/dev/null | grep -q .; then
+            # 获取实际运行中的服务数量
+            RUNNING_COUNT=0
+            TOTAL_COUNT=0
             
-            # 显示各个服务状态
+            # 显示各个服务状态并统计运行数量
             echo -e "${BLUE}   📋 服务详情:${NC}"
-            docker-compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}" | sed 's/^/     /'
+            while read service; do
+                TOTAL_COUNT=$((TOTAL_COUNT + 1))
+                # 使用更准确的状态检查方法
+                if docker-compose ps $service 2>/dev/null | grep -q " Up "; then
+                    echo -e "     ${GREEN}● $service: 运行中${NC}"
+                    RUNNING_COUNT=$((RUNNING_COUNT + 1))
+                else
+                    echo -e "     ${YELLOW}○ $service: 停止${NC}"
+                fi
+            done < <(docker-compose ps --services 2>/dev/null)
+            
+            # 根据实际运行状态显示总体状态
+            if [ $RUNNING_COUNT -gt 0 ]; then
+                echo -e "${GREEN}✅ 基础设施服务: 部分运行中 (${RUNNING_COUNT}/${TOTAL_COUNT}个服务)${NC}"
+            else
+                echo -e "${RED}❌ 基础设施服务: 未运行 (0/${TOTAL_COUNT}个服务)${NC}"
+            fi
             
             # 检查NebulaGraph连接
             if command -v nc > /dev/null 2>&1; then

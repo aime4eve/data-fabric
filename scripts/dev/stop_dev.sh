@@ -27,7 +27,10 @@ echo -e "${NC}"
 
 # 停止前端服务
 stop_frontend() {
-    echo -e "${BLUE}🌐 停止前端服务...${NC}"
+    echo -e "${BLUE}🛑 停止前端服务...${NC}"
+    
+    # 首先检查端口是否被占用（可能PID文件不准确）
+    PORT_PID=$(lsof -Pi :3000 -sTCP:LISTEN -t 2>/dev/null | head -1)
     
     if [ -f "logs/frontend.pid" ]; then
         FRONTEND_PID=$(cat logs/frontend.pid)
@@ -39,20 +42,46 @@ stop_frontend() {
                 echo -e "${RED}❌ 前端服务未正常停止，强制终止...${NC}"
                 kill -9 $FRONTEND_PID
             fi
-            rm -f logs/frontend.pid
             echo -e "${GREEN}✅ 前端服务已停止${NC}"
         else
-            echo -e "${YELLOW}⚠️  前端服务进程不存在，清理PID文件${NC}"
-            rm -f logs/frontend.pid
+            echo -e "${YELLOW}⚠️  前端服务PID文件存在但进程未运行${NC}"
+            # 如果端口被占用但PID文件不匹配，清理端口进程
+            if [ -n "$PORT_PID" ] && [ "$PORT_PID" != "$FRONTEND_PID" ]; then
+                echo -e "${YELLOW}⚠️  检测到端口3000被其他进程占用 (PID: $PORT_PID)，清理中...${NC}"
+                kill -9 $PORT_PID 2>/dev/null || true
+            fi
         fi
+        rm -f logs/frontend.pid
     else
         echo -e "${YELLOW}⚠️  前端服务PID文件不存在${NC}"
+        # 如果端口被占用，清理端口进程
+        if [ -n "$PORT_PID" ]; then
+            echo -e "${YELLOW}⚠️  检测到端口3000被占用 (PID: $PORT_PID)，清理中...${NC}"
+            kill -9 $PORT_PID 2>/dev/null || true
+        fi
+    fi
+    
+    # 最终检查端口是否被占用
+    if lsof -Pi :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then
+        echo -e "${RED}❌ 端口3000仍被占用，尝试强制清理所有相关进程...${NC}"
+        lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+        sleep 1
+        if lsof -Pi :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then
+            echo -e "${RED}❌ 无法释放端口3000，请手动检查${NC}"
+        else
+            echo -e "${GREEN}✅ 端口3000已释放${NC}"
+        fi
+    else
+        echo -e "${GREEN}✅ 端口3000已释放${NC}"
     fi
 }
 
 # 停止后端服务
 stop_backend() {
-    echo -e "${BLUE}⚡ 停止后端服务...${NC}"
+    echo -e "${BLUE}🛑 停止后端服务...${NC}"
+    
+    # 首先检查端口是否被占用（可能PID文件不准确）
+    PORT_PID=$(lsof -Pi :5000 -sTCP:LISTEN -t 2>/dev/null | head -1)
     
     if [ -f "logs/backend.pid" ]; then
         BACKEND_PID=$(cat logs/backend.pid)
@@ -64,14 +93,37 @@ stop_backend() {
                 echo -e "${RED}❌ 后端服务未正常停止，强制终止...${NC}"
                 kill -9 $BACKEND_PID
             fi
-            rm -f logs/backend.pid
             echo -e "${GREEN}✅ 后端服务已停止${NC}"
         else
-            echo -e "${YELLOW}⚠️  后端服务进程不存在，清理PID文件${NC}"
-            rm -f logs/backend.pid
+            echo -e "${YELLOW}⚠️  后端服务PID文件存在但进程未运行${NC}"
+            # 如果端口被占用但PID文件不匹配，清理端口进程
+            if [ -n "$PORT_PID" ] && [ "$PORT_PID" != "$BACKEND_PID" ]; then
+                echo -e "${YELLOW}⚠️  检测到端口5000被其他进程占用 (PID: $PORT_PID)，清理中...${NC}"
+                kill -9 $PORT_PID 2>/dev/null || true
+            fi
         fi
+        rm -f logs/backend.pid
     else
         echo -e "${YELLOW}⚠️  后端服务PID文件不存在${NC}"
+        # 如果端口被占用，清理端口进程
+        if [ -n "$PORT_PID" ]; then
+            echo -e "${YELLOW}⚠️  检测到端口5000被占用 (PID: $PORT_PID)，清理中...${NC}"
+            kill -9 $PORT_PID 2>/dev/null || true
+        fi
+    fi
+    
+    # 最终检查端口是否被占用
+    if lsof -Pi :5000 -sTCP:LISTEN -t >/dev/null 2>&1; then
+        echo -e "${RED}❌ 端口5000仍被占用，尝试强制清理所有相关进程...${NC}"
+        lsof -ti:5000 | xargs kill -9 2>/dev/null || true
+        sleep 1
+        if lsof -Pi :5000 -sTCP:LISTEN -t >/dev/null 2>&1; then
+            echo -e "${RED}❌ 无法释放端口5000，请手动检查${NC}"
+        else
+            echo -e "${GREEN}✅ 端口5000已释放${NC}"
+        fi
+    else
+        echo -e "${GREEN}✅ 端口5000已释放${NC}"
     fi
 }
 
