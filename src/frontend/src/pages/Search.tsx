@@ -421,7 +421,7 @@ export const SearchPage: React.FC = () => {
                           <Space size="small">
                             <FolderOutlined />
                             <Text type="secondary" className="text-xs">
-                              {result.file_path.replace('/root/knowledge-base-app/company_knowledge_base/', '')}
+                              {result.file_path}
                             </Text>
                           </Space>
                           <Space size="small">
