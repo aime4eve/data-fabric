@@ -79,11 +79,7 @@ export const DocumentUpload: React.FC = () => {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadedDocument, setUploadedDocument] = useState<any>(null);
 
-  // 确保form实例在组件挂载后立即可用
-  useEffect(() => {
-    // 强制触发form实例的初始化
-    form.resetFields();
-  }, [form]);
+
 
 
 
