@@ -8,6 +8,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from application.services.auth_service import AuthService
 from infrastructure.repositories.user_repository_impl import UserRepositoryImpl
 from shared_kernel.exceptions.auth_exceptions import AuthenticationError, AuthorizationError
+from shared_kernel.utils.validators import validate_email_ex
 
 # 创建命名空间
 auth_ns = Namespace('auth', description='用户认证相关接口')
@@ -50,6 +51,21 @@ login_response_model = auth_ns.model('LoginResponse', {
     'user': fields.Nested(user_model, description='用户信息')
 })
 
+# 注册响应模型
+register_response_model = auth_ns.model('RegisterResponse', {
+    'success': fields.Boolean(description='是否成功'),
+    'message': fields.String(description='消息'),
+    'code': fields.String(description='错误编码'),
+    'reason': fields.String(description='错误原因分类'),
+    'user': fields.Nested(user_model, description='用户信息')
+})
+
+# 用户信息响应模型（用于 /auth/profile）
+profile_response_model = auth_ns.model('ProfileResponse', {
+    'success': fields.Boolean(description='是否成功'),
+    'message': fields.String(description='消息'),
+    'user': fields.Nested(user_model, description='用户信息')
+})
 
 @auth_ns.route('/login')
 class LoginResource(Resource):
@@ -102,7 +118,7 @@ class RegisterResource(Resource):
     """注册接口"""
     
     @auth_ns.expect(register_model)
-    @auth_ns.marshal_with(user_model)
+    @auth_ns.marshal_with(register_response_model)
     def post(self):
         """用户注册"""
         try:
@@ -118,6 +134,17 @@ class RegisterResource(Resource):
                     'message': '用户名、邮箱和密码不能为空'
                 }, 400
             
+            # 预校验邮箱（格式与可达性，使用环境默认策略）
+            email_check = validate_email_ex(email, allow_empty=False)
+            if not email_check.get('ok'):
+                return {
+                    'success': False,
+                    'message': email_check.get('message') or '邮箱格式不正确',
+                    'code': email_check.get('code'),
+                    'reason': email_check.get('reason'),
+                }, 400
+            email = email_check.get('email') or email
+
             # 创建认证服务
             user_repository = UserRepositoryImpl()
             auth_service = AuthService(user_repository)
@@ -239,7 +266,7 @@ class ProfileResource(Resource):
     """用户信息接口"""
     
     @jwt_required()
-    @auth_ns.marshal_with(user_model)
+    @auth_ns.marshal_with(profile_response_model)
     def get(self):
         """获取当前用户信息"""
         try:

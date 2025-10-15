@@ -46,7 +46,10 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   success: boolean;
   message: string;
-  user: User;
+  // 后端在邮箱校验失败时返回的结构化错误信息
+  code?: string;
+  reason?: string; // format_error / deliverability_error 等
+  user?: User;
 }
 
 // 修改密码请求接口

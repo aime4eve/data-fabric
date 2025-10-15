@@ -147,10 +147,7 @@ class DocumentService:
             raise AuthorizationError("无权限删除此文档")
         
         # 软删除
-        document.soft_delete()
-        self.document_repository.update(document)
-        
-        return True
+        return self.document_repository.delete(document_id)
     
     def publish_document(self, document_id: str, user_id: str) -> Document:
         """发布文档"""
@@ -179,6 +176,10 @@ class DocumentService:
         # 归档文档
         document.archive()
         return self.document_repository.update(document)
+    
+    def count_documents_by_status(self, status: str) -> int:
+        """根据状态计算文档数量"""
+        return self.document_repository.count_by_status(status)
     
     def list_documents(
         self, 

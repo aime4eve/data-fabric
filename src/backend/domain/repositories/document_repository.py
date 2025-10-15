@@ -37,6 +37,11 @@ class DocumentRepository(ABC):
         pass
     
     @abstractmethod
+    def count_by_status(self, status: str) -> int:
+        """根据状态计算文档数量"""
+        pass
+
+    @abstractmethod
     def find_all(self, page: int = 1, size: int = 20) -> List[Document]:
         """分页查找所有文档"""
         pass

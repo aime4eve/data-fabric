@@ -3,6 +3,7 @@
 """
 from typing import Optional, List
 from sqlalchemy.orm import Session
+import uuid
 
 from domain.entities.user import User
 from domain.repositories.user_repository import UserRepository
@@ -18,12 +19,19 @@ class UserRepositoryImpl(UserRepository):
     
     def save(self, user: User) -> User:
         """保存用户"""
+        # 将字符串UUID转换为uuid.UUID以适配数据库模型
+        user_id_uuid = uuid.UUID(user.id) if isinstance(user.id, str) else user.id
         user_model = UserModel(
-            id=user.id,
+            id=user_id_uuid,
             username=user.username,
             email=user.email,
             password_hash=user.password_hash,
             role=user.role,
+            full_name=user.full_name,
+            phone=user.phone,
+            department=user.department,
+            position=user.position,
+            avatar_url=user.avatar_url,
             created_at=user.created_at,
             updated_at=user.updated_at
         )
@@ -35,7 +43,12 @@ class UserRepositoryImpl(UserRepository):
     
     def find_by_id(self, user_id: str) -> Optional[User]:
         """根据ID查找用户"""
-        user_model = self.session.query(UserModel).filter_by(id=user_id).first()
+        # 将字符串UUID转换为uuid.UUID以进行查询
+        try:
+            user_id_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+        except (ValueError, TypeError):
+            return None
+        user_model = self.session.query(UserModel).filter_by(id=user_id_uuid).first()
         return self._model_to_entity(user_model) if user_model else None
     
     def find_by_username(self, username: str) -> Optional[User]:
@@ -56,7 +69,11 @@ class UserRepositoryImpl(UserRepository):
     
     def update(self, user: User) -> User:
         """更新用户"""
-        user_model = self.session.query(UserModel).filter_by(id=user.id).first()
+        try:
+            user_id_uuid = uuid.UUID(user.id) if isinstance(user.id, str) else user.id
+        except (ValueError, TypeError):
+            raise ValueError(f"User with id {user.id} not found")
+        user_model = self.session.query(UserModel).filter_by(id=user_id_uuid).first()
         if not user_model:
             raise ValueError(f"User with id {user.id} not found")
         
@@ -64,6 +81,11 @@ class UserRepositoryImpl(UserRepository):
         user_model.email = user.email
         user_model.password_hash = user.password_hash
         user_model.role = user.role
+        user_model.full_name = user.full_name
+        user_model.phone = user.phone
+        user_model.department = user.department
+        user_model.position = user.position
+        user_model.avatar_url = user.avatar_url
         user_model.updated_at = user.updated_at
         
         self.session.commit()
@@ -71,7 +93,11 @@ class UserRepositoryImpl(UserRepository):
     
     def delete(self, user_id: str) -> bool:
         """删除用户"""
-        user_model = self.session.query(UserModel).filter_by(id=user_id).first()
+        try:
+            user_id_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+        except (ValueError, TypeError):
+            return False
+        user_model = self.session.query(UserModel).filter_by(id=user_id_uuid).first()
         if not user_model:
             return False
         
@@ -95,6 +121,11 @@ class UserRepositoryImpl(UserRepository):
             email=model.email,
             password_hash=model.password_hash,
             role=model.role,
+            full_name=getattr(model, 'full_name', None),
+            phone=getattr(model, 'phone', None),
+            department=getattr(model, 'department', None),
+            position=getattr(model, 'position', None),
+            avatar_url=getattr(model, 'avatar_url', None),
             created_at=model.created_at,
             updated_at=model.updated_at
         )

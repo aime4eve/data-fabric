@@ -7,6 +7,7 @@ from flask import request, jsonify
 from flask_restx import Resource, Namespace, fields
 
 from infrastructure.external_services.search import get_elasticsearch_client
+from application.services.document_service import DocumentService
 
 logger = logging.getLogger(__name__)
 
@@ -330,13 +331,16 @@ class SearchStatsResource(Resource):
                     'created': False
                 }
             
+            # 获取数据库中的文档总数
+            document_service = DocumentService()
+            db_stats = document_service.get_document_statistics()
+            
             # 获取索引统计信息
             stats = es_client.es.indices.stats(index=index_name)
-            count = es_client.es.count(index=index_name)
             
             return {
                 'exists': True,
-                'document_count': count['count'],
+                'document_count': db_stats['total_documents'],
                 'index_size': stats['indices'][index_name]['total']['store']['size_in_bytes'],
                 'created': True
             }

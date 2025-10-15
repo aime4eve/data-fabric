@@ -2,6 +2,7 @@
 文档控制器
 """
 import os
+import logging
 from flask import request, jsonify, send_file
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -11,6 +12,11 @@ from application.services.document_service import DocumentService
 from infrastructure.repositories.document_repository_impl import DocumentRepositoryImpl
 from domain.entities.document import DocumentStatus
 from infrastructure.persistence.database import db
+from shared_kernel.exceptions.auth_exceptions import AuthorizationError
+
+# 设置日志记录
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # 创建命名空间
 document_ns = Namespace('documents', description='文档管理接口')
@@ -90,8 +96,7 @@ class DocumentListResource(Resource):
                 })
             
             # 获取总数
-            from infrastructure.persistence.models import DocumentModel
-            total_count = DocumentModel.query.count()
+            total_count = service.count_documents_by_status(status=DocumentStatus.PUBLISHED.value)
             
             return {
                 'success': True,
@@ -121,13 +126,9 @@ class DocumentListResource(Resource):
             data = request.get_json()
             # TODO: 实现文档创建逻辑
             return {
-                'id': 'new_doc_id',
-                'title': data.get('title', '新文档'),
-                'content_path': '/documents/new_doc.md',
-                'status': 'draft',
-                'created_at': '2025-01-01T00:00:00Z',
-                'updated_at': '2025-01-01T00:00:00Z'
-            }, 201
+                'success': False,
+                'message': '文档创建功能暂未实现，请使用文档上传接口'
+            }, 501
         except Exception as e:
             return {'error': str(e)}, 500
 
@@ -163,8 +164,8 @@ class DocumentResource(Resource):
                     'created_at': document.created_at.isoformat() + 'Z',
                     'updated_at': document.updated_at.isoformat() + 'Z',
                     'metadata': document.metadata,
-                    'author_id': document.author_id,
-                    'category_id': document.category_id
+                    'author_id': str(document.author_id) if document.author_id else None,
+                    'category_id': str(document.category_id) if document.category_id else None
                 }
             }, 200
         except Exception as e:
@@ -182,24 +183,55 @@ class DocumentResource(Resource):
             data = request.get_json()
             # TODO: 实现文档更新逻辑
             return {
-                'id': document_id,
-                'title': data.get('title', f'更新的文档 {document_id}'),
-                'content_path': f'/documents/{document_id}.md',
-                'status': data.get('status', 'published'),
-                'created_at': '2025-01-01T00:00:00Z',
-                'updated_at': '2025-01-01T00:00:00Z'
-            }, 200
+                'success': False,
+                'message': '文档更新功能暂未实现'
+            }, 501
         except Exception as e:
             return {'error': str(e)}, 500
     
     @jwt_required()
     def delete(self, document_id):
         """删除文档"""
+        print(f"Attempting to delete document with ID: {document_id}")
         try:
-            # TODO: 实现文档删除逻辑
-            return {'message': f'文档 {document_id} 删除成功'}, 204
+            current_user_id = get_jwt_identity()
+            print(f"Current user ID: {current_user_id}")
+            
+            service = get_document_service()
+            print("Document service obtained.")
+            
+            # 调用服务层删除文档
+            print("Calling document service to delete document...")
+            success = service.delete_document(document_id, current_user_id)
+            print(f"Document service returned: {success}")
+            
+            if success:
+                print("Document deleted successfully.")
+                return {
+                    'success': True,
+                    'message': '文档删除成功'
+                }, 200
+            else:
+                print("Document deletion failed.")
+                return {
+                    'success': False,
+                    'message': '文档删除失败'
+                }, 400
+                
+        except AuthorizationError as e:
+            print(f"Authorization error: {e}")
+            return {
+                'success': False,
+                'message': str(e)
+            }, 403
         except Exception as e:
-            return {'error': str(e)}, 500
+            import traceback
+            traceback.print_exc()
+            print(f"An unexpected error occurred: {e}")
+            return {
+                'success': False,
+                'message': f'删除文档时发生错误: {str(e)}'
+            }, 500
 
 @document_ns.route('/upload')
 class DocumentUploadResource(Resource):

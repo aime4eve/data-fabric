@@ -129,3 +129,4 @@ instance/
 
 # Cache directories
 .cache/
+tests/bak（废弃）

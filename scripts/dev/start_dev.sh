@@ -341,7 +341,7 @@ show_status() {
     echo -e "${PURPLE}🌐 访问地址:${NC}"
     echo "  📱 前端应用: http://localhost:3000"
     echo "  🔌 后端API: http://localhost:5000"
-    echo "  📚 API文档: http://localhost:5000/docs"
+    echo "  📚 API文档: http://localhost:5000/api/v1/docs/"
     echo "  ❤️  健康检查: http://localhost:5000/health"
     echo ""
     echo -e "${PURPLE}🗄️ 数据库连接:${NC}"

@@ -15,7 +15,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from infrastructure.persistence.database import db
-from infrastructure.persistence.models import DocumentModel, CategoryModel
+from infrastructure.persistence.models import DocumentModel, CategoryModel, UserModel
 
 # 配置日志
 logging.basicConfig(
@@ -150,10 +150,19 @@ KNOWLEDGE_BASE_STRUCTURE = {
 
 def create_category(name, description, parent_id=None, sort_order=0):
     """创建分类"""
+    # 生成唯一路径：如果是子分类，包含父分类信息
+    if parent_id:
+        parent_category = CategoryModel.query.get(parent_id)
+        if parent_category:
+            path = f"{parent_category.path}/{name}"
+        else:
+            path = f"company_knowledge_base/{name}"
+    else:
+        path = f"company_knowledge_base/{name}"
+    
     category = CategoryModel(
-        id=str(uuid.uuid4()),
         name=name,
-        description=description,
+        path=path,
         parent_id=parent_id,
         sort_order=sort_order,
         created_at=datetime.now(),
@@ -164,17 +173,30 @@ def create_category(name, description, parent_id=None, sort_order=0):
     return category
 
 
-def create_document(title, content_path, category_id, description="", author_id="admin"):
+def create_document(title, content_path, category_id, description=""):
     """创建文档"""
+    # 获取或创建系统用户
+    system_user = UserModel.query.filter_by(username='admin').first()
+    if not system_user:
+        system_user = UserModel(
+            username='admin',
+            email='admin@system.com',
+            password_hash='system',
+            role='admin',
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        db.session.add(system_user)
+        db.session.flush()  # 获取ID
+    
     document = DocumentModel(
-        id=str(uuid.uuid4()),
         title=title,
         content_path=content_path,
+        content_text=description,  # 使用description作为content_text
         category_id=category_id,
-        author_id=author_id,
+        author_id=system_user.id,  # 使用系统用户的UUID
         status="published",
-        description=description,
-        metadata={
+        doc_metadata={
             "file_type": "directory",
             "auto_generated": True,
             "source": "company_knowledge_base"
@@ -190,13 +212,11 @@ def init_knowledge_base_data():
     """初始化知识库数据"""
     logger.info("开始初始化知识库文档数据...")
     
-    # 检查是否已有数据
-    existing_docs = DocumentModel.query.filter(
-        DocumentModel.metadata.op('->>')('source') == 'company_knowledge_base'
-    ).count()
+    # 检查是否已有数据 - 使用更简单的查询方式
+    existing_docs = db.session.query(DocumentModel).count()
     
     if existing_docs > 0:
-        logger.info(f"发现已有 {existing_docs} 个知识库文档，跳过初始化")
+        logger.info(f"发现已有 {existing_docs} 个文档记录，跳过初始化")
         return
     
     # 创建根分类

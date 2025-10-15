@@ -18,6 +18,7 @@ import DocumentEdit from './pages/DocumentEdit';
 import { SearchPage } from './pages/Search';
 import { KnowledgeGraph } from './pages/KnowledgeGraph';
 import { CategoryManagement } from './pages/CategoryManagement';
+import { FileManager } from './pages/FileManager';
 import Settings from './pages/Settings';
 import './App.css';
 
@@ -177,6 +178,16 @@ function App() {
                   <ProtectedRoute>
                     <MainLayout>
                       <CategoryManagement />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/file-manager"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <FileManager />
                     </MainLayout>
                   </ProtectedRoute>
                 }

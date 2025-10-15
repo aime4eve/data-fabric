@@ -37,5 +37,25 @@ api.add_namespace(user_ns, path='/users')
 from presentation.controllers.search_controller import search_ns
 api.add_namespace(search_ns, path='/search')
 
+# 导入并注册目录控制器
+from presentation.controllers.directory_controller import directory_ns
+api.add_namespace(directory_ns, path='/directories')
+
+# 导入并注册文件控制器
+from presentation.controllers.file_controller import file_ns
+api.add_namespace(file_ns, path='/files')
+
+# 导入并注册标签控制器
+from presentation.controllers.tag_controller import tag_ns
+api.add_namespace(tag_ns, path='/tags')
+
+# 导入并注册权限控制器（占位）
+from presentation.controllers.permission_controller import permission_ns
+api.add_namespace(permission_ns, path='/permissions')
+
+# 导入并注册审计控制器（占位）
+from presentation.controllers.audit_controller import audit_ns
+api.add_namespace(audit_ns, path='/audits')
+
 # 导出API蓝图
 __all__ = ['api_bp']

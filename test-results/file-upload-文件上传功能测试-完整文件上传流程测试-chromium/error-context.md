@@ -1,0 +1,140 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]: 企业知识库
+      - menu [ref=e8]:
+        - menuitem "仪表板" [ref=e9] [cursor=pointer]:
+          - generic [ref=e10] [cursor=pointer]: 仪表板
+        - menuitem "文档管理" [ref=e11] [cursor=pointer]:
+          - generic [ref=e12] [cursor=pointer]: 文档管理
+        - menuitem "搜索" [ref=e13] [cursor=pointer]:
+          - generic [ref=e14] [cursor=pointer]: 搜索
+        - menuitem "知识图谱" [ref=e15] [cursor=pointer]:
+          - generic [ref=e16] [cursor=pointer]: 知识图谱
+        - menuitem [disabled]:
+          - img:
+            - img
+    - generic [ref=e18] [cursor=pointer]:
+      - img "user" [ref=e21] [cursor=pointer]:
+        - img [ref=e22] [cursor=pointer]
+      - generic [ref=e25] [cursor=pointer]: admin
+  - generic [ref=e26]:
+    - complementary [ref=e27]:
+      - generic [ref=e29]:
+        - generic [ref=e30]: 导航菜单
+        - menu [ref=e31]:
+          - menuitem "dashboard 仪表板" [ref=e32] [cursor=pointer]:
+            - img "dashboard" [ref=e33] [cursor=pointer]:
+              - img [ref=e34] [cursor=pointer]
+            - generic [ref=e36] [cursor=pointer]: 仪表板
+          - menuitem "file-text 文档管理" [ref=e37] [cursor=pointer]:
+            - img "file-text" [ref=e38] [cursor=pointer]:
+              - img [ref=e39] [cursor=pointer]
+            - generic [ref=e42] [cursor=pointer]: 文档管理
+          - menuitem "folder 分类管理" [ref=e43] [cursor=pointer]:
+            - img "folder" [ref=e44] [cursor=pointer]:
+              - img [ref=e45] [cursor=pointer]
+            - generic [ref=e47] [cursor=pointer]: 分类管理
+          - menuitem "folder-open 文件管理" [ref=e48] [cursor=pointer]:
+            - img "folder-open" [ref=e49] [cursor=pointer]:
+              - img [ref=e50] [cursor=pointer]
+            - generic [ref=e52] [cursor=pointer]: 文件管理
+          - menuitem "search 搜索" [ref=e53] [cursor=pointer]:
+            - img "search" [ref=e54] [cursor=pointer]:
+              - img [ref=e55] [cursor=pointer]
+            - generic [ref=e57] [cursor=pointer]: 搜索
+          - menuitem "share-alt 知识图谱" [ref=e58] [cursor=pointer]:
+            - img "share-alt" [ref=e59] [cursor=pointer]:
+              - img [ref=e60] [cursor=pointer]
+            - generic [ref=e62] [cursor=pointer]: 知识图谱
+          - separator [ref=e63]
+          - menuitem "setting 设置" [ref=e64] [cursor=pointer]:
+            - img "setting" [ref=e65] [cursor=pointer]:
+              - img [ref=e66] [cursor=pointer]
+            - generic [ref=e68] [cursor=pointer]: 设置
+    - main [ref=e70]:
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - heading "file-text 文档上传" [level=2] [ref=e74]:
+            - img "file-text" [ref=e75]:
+              - img [ref=e76]
+            - text: 文档上传
+          - generic [ref=e78]: 按照以下步骤完成文档上传：选择文件 → 选择目录 → 填写信息 → 确认上传
+        - generic [ref=e81]:
+          - generic [ref=e83]:
+            - img "inbox" [ref=e86]:
+              - img [ref=e87]
+            - generic [ref=e89]:
+              - generic [ref=e90]: 选择文件
+              - generic [ref=e91]: 选择要上传的文档文件
+          - generic [ref=e93]:
+            - img "folder" [ref=e96]:
+              - img [ref=e97]
+            - generic [ref=e99]:
+              - generic [ref=e100]: 选择目录
+              - generic [ref=e101]: 选择文档存储目录
+          - generic [ref=e103]:
+            - img "edit" [ref=e106]:
+              - img [ref=e107]
+            - generic [ref=e109]:
+              - generic [ref=e110]: 填写信息
+              - generic [ref=e111]: 填写文档基本信息
+        - alert [ref=e112]:
+          - img "info-circle" [ref=e113]:
+            - img [ref=e114]
+          - generic [ref=e117]:
+            - generic [ref=e118]: 上传提示
+            - generic [ref=e120]:
+              - paragraph [ref=e121]: • 支持的文件格式：PDF、Word、Excel、PowerPoint、TXT、Markdown、CSV
+              - paragraph [ref=e122]: • 单个文件大小不超过 10MB
+              - paragraph [ref=e123]: • 建议为文档选择合适的分类和目录，便于后续管理和检索
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - generic [ref=e126]:
+              - generic [ref=e130]:
+                - img "inbox" [ref=e132]:
+                  - img [ref=e133]
+                - generic [ref=e136]: 第一步：选择文件
+              - generic [ref=e137]:
+                - button "inbox 点击或拖拽文件到此区域上传 支持单个文件上传，文件大小不超过 10MB" [ref=e140] [cursor=pointer]:
+                  - generic [ref=e141] [cursor=pointer]:
+                    - paragraph [ref=e142] [cursor=pointer]:
+                      - img "inbox" [ref=e143] [cursor=pointer]:
+                        - img [ref=e144] [cursor=pointer]
+                    - paragraph [ref=e146] [cursor=pointer]: 点击或拖拽文件到此区域上传
+                    - paragraph [ref=e147] [cursor=pointer]: 支持单个文件上传，文件大小不超过 10MB
+                - generic [ref=e148]:
+                  - generic [ref=e149]: 支持的文件格式：
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: .pdf
+                    - generic [ref=e152]: .doc
+                    - generic [ref=e153]: .docx
+                    - generic [ref=e154]: .xls
+                    - generic [ref=e155]: .xlsx
+                    - generic [ref=e156]: .ppt
+                    - generic [ref=e157]: .pptx
+                    - generic [ref=e158]: .txt
+                    - generic [ref=e159]: .md
+                    - generic [ref=e160]: .csv
+            - generic [ref=e161]:
+              - generic [ref=e165]:
+                - img "folder" [ref=e167]:
+                  - img [ref=e168]
+                - generic [ref=e171]: 第二步：选择目录
+              - generic [ref=e173]:
+                - img "exclamation-circle" [ref=e174]:
+                  - img [ref=e175]
+                - paragraph [ref=e178]: 请先选择要上传的文件
+          - generic [ref=e180]:
+            - generic [ref=e184]:
+              - img "edit" [ref=e186]:
+                - img [ref=e187]
+              - generic [ref=e190]: 第三步：填写信息
+            - generic [ref=e192]:
+              - img "exclamation-circle" [ref=e193]:
+                - img [ref=e194]
+              - paragraph [ref=e197]: 请先完成文件选择和目录选择
+```

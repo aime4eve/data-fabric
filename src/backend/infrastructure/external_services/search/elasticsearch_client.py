@@ -23,11 +23,11 @@ class ElasticsearchClient:
     def _connect(self):
         """建立Elasticsearch连接"""
         try:
+            # 兼容新版 elasticsearch Python 客户端参数
             self.es = Elasticsearch(
                 [{'host': self.host, 'port': self.port, 'scheme': 'http'}],
-                timeout=30,
+                request_timeout=30,
                 max_retries=10,
-                retry_on_timeout=True,
                 verify_certs=False
             )
             

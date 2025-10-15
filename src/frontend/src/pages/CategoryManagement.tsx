@@ -34,6 +34,7 @@ import {
 } from '@ant-design/icons';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import { CategoryService, Category, CreateCategoryRequest, UpdateCategoryRequest } from '../services/categoryService';
+import { DocumentService } from '../services/documentService';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -78,13 +79,17 @@ export const CategoryManagement: React.FC = () => {
       const categoriesData = response?.data || [];
       setCategories(categoriesData);
       
+      // 获取文档统计数据
+      const statsResponse = await DocumentService.getDocumentStatistics();
+      const totalDocuments = statsResponse.data.total_documents;
+
       // 计算统计数据
       const flatCategories = flattenCategories(categoriesData);
       setStats({
         total: flatCategories.length,
         active: flatCategories.filter(c => c.is_active).length,
         inactive: flatCategories.filter(c => !c.is_active).length,
-        totalDocuments: flatCategories.reduce((sum, c) => sum + (c.document_count || 0), 0),
+        totalDocuments: totalDocuments,
       });
 
       // 转换为树形数据

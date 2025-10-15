@@ -1,0 +1,112 @@
+# GraphQL Schema 草案：目录与权限
+
+type Directory {
+  id: ID!
+  knowledgeBaseId: ID!
+  parentId: ID
+  name: String!
+  slug: String!
+  path: String!
+  order: Int
+  depth: Int!
+  hasChildren: Boolean!
+  version: String!
+  children(limit: Int, offset: Int): [Directory!]!
+}
+
+type PermissionRule {
+  subjectType: String! # user|group|role
+  subjectId: ID!
+  actions: [String!]! # view|edit|manage
+}
+
+type PermissionConfig {
+  inherit: Boolean!
+  rules: [PermissionRule!]!
+  version: String!
+}
+
+type TemplateInfo {
+  id: ID!
+  name: String!
+  version: String!
+  description: String
+}
+
+type InitResult {
+  rootId: ID!
+  appliedVersion: String!
+  createdNodes: Int!
+  skippedNodes: Int!
+}
+
+type AuditEvent {
+  id: ID!
+  type: String!
+  operator: String!
+  timestamp: String!
+  before: String
+  after: String
+}
+
+type Query {
+  directoryTree(knowledgeBaseId: ID!, rootId: ID, depth: Int): [Directory!]!
+  permissions(directoryId: ID!): PermissionConfig!
+  templates(scope: String! = "directory"): [TemplateInfo!]!
+  templatePreview(id: ID!): String! # JSON string of structure & permissions
+  audit(directoryId: ID!, types: [String!]): [AuditEvent!]!
+}
+
+input CreateDirectoryInput {
+  knowledgeBaseId: ID!
+  parentId: ID!
+  name: String!
+  order: Int
+}
+
+input UpdateDirectoryInput {
+  id: ID!
+  name: String
+  order: Int
+  ifMatchVersion: String!
+}
+
+input MoveDirectoryInput {
+  id: ID!
+  newParentId: ID!
+  position: Int
+  ifMatchVersion: String!
+}
+
+input SetInheritanceInput {
+  directoryId: ID!
+  inherit: Boolean!
+}
+
+input SetPermissionRulesInput {
+  directoryId: ID!
+  rules: [PermissionRuleInput!]!
+  ifMatchVersion: String!
+}
+
+input PermissionRuleInput {
+  subjectType: String!
+  subjectId: ID!
+  actions: [String!]!
+}
+
+input InitFromTemplateInput {
+  knowledgeBaseId: ID!
+  templateId: ID!
+  preview: Boolean
+}
+
+type Mutation {
+  initDirectoriesFromTemplate(input: InitFromTemplateInput!): InitResult!
+  createDirectory(input: CreateDirectoryInput!): Directory!
+  updateDirectory(input: UpdateDirectoryInput!): Directory!
+  deleteDirectory(id: ID!, soft: Boolean = true): Boolean!
+  moveDirectory(input: MoveDirectoryInput!): Directory!
+  setInheritance(input: SetInheritanceInput!): PermissionConfig!
+  setPermissionRules(input: SetPermissionRulesInput!): PermissionConfig!
+}

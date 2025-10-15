@@ -59,6 +59,7 @@ scripts/dev/
 **启动的服务**:
 - **前端应用**: http://localhost:3000
 - **后端API**: http://localhost:5000
+- **API文档**: http://localhost:5000/api/v1/docs/
 - **数据库服务**: PostgreSQL、Redis、Elasticsearch、NebulaGraph
 
 ### stop_dev.sh - 停止开发环境

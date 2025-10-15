@@ -2,7 +2,7 @@
 SQLAlchemy ORM模型定义
 """
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Integer, Text, ForeignKey, JSON
+from sqlalchemy import Column, String, DateTime, Integer, Text, ForeignKey, JSON, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -22,6 +22,12 @@ class UserModel(db.Model):
     email = Column(String(255), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     role = Column(String(50), nullable=False, default='user', index=True)
+    # 扩展资料字段
+    full_name = Column(String(255), nullable=True)
+    phone = Column(String(50), nullable=True)
+    department = Column(String(100), nullable=True)
+    position = Column(String(100), nullable=True)
+    avatar_url = Column(String(512), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     
@@ -54,6 +60,31 @@ class CategoryModel(db.Model):
         return f'<Category {self.name}>'
 
 
+class DirectoryModel(db.Model):
+    """目录模型 - 管理company_knowledge_base目录结构"""
+    __tablename__ = 'directories'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(255), nullable=False)  # 目录名称
+    path = Column(String(1024), nullable=False, index=True)  # 相对于company_knowledge_base的路径
+    full_path = Column(String(1024), nullable=False, unique=True, index=True)  # 完整的文件系统路径
+    parent_id = Column(UUID(as_uuid=True), ForeignKey('directories.id'), nullable=True, index=True)
+    level = Column(Integer, default=0, nullable=False)  # 目录层级，根目录为0
+    sort_order = Column(Integer, default=0, nullable=False)  # 同级目录排序
+    description = Column(Text, nullable=True)  # 目录描述
+    meta_data = Column(JSON, nullable=True)  # 目录元数据
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    
+    # 关系
+    parent = relationship("DirectoryModel", remote_side=[id], backref="children")
+    files = relationship("FileModel", back_populates="directory", lazy='dynamic')
+    tags = relationship("DirectoryTagModel", back_populates="directory", lazy='dynamic')
+    
+    def __repr__(self):
+        return f'<Directory {self.name} at {self.path}>'
+
+
 class DocumentModel(db.Model):
     """文档模型"""
     __tablename__ = 'documents'
@@ -81,6 +112,32 @@ class DocumentModel(db.Model):
         return f'<Document {self.title}>'
 
 
+class FileModel(db.Model):
+    """文件模型 - 管理上传到目录中的文件"""
+    __tablename__ = 'files'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(255), nullable=False)  # 文件名
+    original_name = Column(String(255), nullable=False)  # 原始文件名
+    file_path = Column(String(1024), nullable=False)  # 相对于company_knowledge_base的文件路径
+    full_path = Column(String(1024), nullable=False, unique=True, index=True)  # 完整的文件系统路径
+    directory_id = Column(UUID(as_uuid=True), ForeignKey('directories.id'), nullable=False, index=True)
+    file_size = Column(Integer, nullable=False)  # 文件大小（字节）
+    file_type = Column(String(100), nullable=False)  # 文件类型/MIME类型
+    file_extension = Column(String(20), nullable=False)  # 文件扩展名
+    description = Column(Text, nullable=True)  # 文件描述
+    meta_data = Column(JSON, nullable=True)  # 文件元数据
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    
+    # 关系
+    directory = relationship("DirectoryModel", back_populates="files")
+    tags = relationship("FileTagModel", back_populates="file", lazy='dynamic')
+    
+    def __repr__(self):
+        return f'<File {self.name} in {self.file_path}>'
+
+
 class DocumentVersionModel(db.Model):
     """文档版本模型"""
     __tablename__ = 'document_versions'
@@ -104,10 +161,17 @@ class TagModel(db.Model):
     __tablename__ = 'tags'
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = Column(String(100), unique=True, nullable=False, index=True)
+    name = Column(String(50), unique=True, nullable=False, index=True)
+    color = Column(String(7), nullable=True)  # 标签颜色，格式：#FFFFFF
+    description = Column(String(255), nullable=True)
+    category = Column(String(50), nullable=True)  # 标签分类
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     
     # 关系
     documents = relationship("DocumentTagModel", back_populates="tag", lazy='dynamic')
+    directories = relationship("DirectoryTagModel", back_populates="tag", lazy='dynamic')
+    files = relationship("FileTagModel", back_populates="tag", lazy='dynamic')
     
     def __repr__(self):
         return f'<Tag {self.name}>'
@@ -117,15 +181,60 @@ class DocumentTagModel(db.Model):
     """文档标签关联模型"""
     __tablename__ = 'document_tags'
     
-    document_id = Column(UUID(as_uuid=True), ForeignKey('documents.id', ondelete='CASCADE'), primary_key=True)
-    tag_id = Column(UUID(as_uuid=True), ForeignKey('tags.id', ondelete='CASCADE'), primary_key=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    document_id = Column(UUID(as_uuid=True), ForeignKey('documents.id'), nullable=False, index=True)
+    tag_id = Column(UUID(as_uuid=True), ForeignKey('tags.id'), nullable=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     # 关系
     document = relationship("DocumentModel", back_populates="tags")
     tag = relationship("TagModel", back_populates="documents")
     
+    # 复合唯一约束
+    __table_args__ = (UniqueConstraint('document_id', 'tag_id', name='uq_document_tag'),)
+    
     def __repr__(self):
         return f'<DocumentTag {self.document_id}-{self.tag_id}>'
+
+
+class DirectoryTagModel(db.Model):
+    """目录标签关联模型"""
+    __tablename__ = 'directory_tags'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    directory_id = Column(UUID(as_uuid=True), ForeignKey('directories.id'), nullable=False, index=True)
+    tag_id = Column(UUID(as_uuid=True), ForeignKey('tags.id'), nullable=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    
+    # 关系
+    directory = relationship("DirectoryModel", back_populates="tags")
+    tag = relationship("TagModel", back_populates="directories")
+    
+    # 复合唯一约束
+    __table_args__ = (UniqueConstraint('directory_id', 'tag_id', name='uq_directory_tag'),)
+    
+    def __repr__(self):
+        return f'<DirectoryTag {self.directory_id}-{self.tag_id}>'
+
+
+class FileTagModel(db.Model):
+    """文件标签关联模型"""
+    __tablename__ = 'file_tags'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    file_id = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=False, index=True)
+    tag_id = Column(UUID(as_uuid=True), ForeignKey('tags.id'), nullable=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    
+    # 关系
+    file = relationship("FileModel", back_populates="tags")
+    tag = relationship("TagModel", back_populates="files")
+    
+    # 复合唯一约束
+    __table_args__ = (UniqueConstraint('file_id', 'tag_id', name='uq_file_tag'),)
+    
+    def __repr__(self):
+        return f'<FileTag {self.file_id}-{self.tag_id}>'
 
 
 class UserFavoriteModel(db.Model):
@@ -142,3 +251,37 @@ class UserFavoriteModel(db.Model):
     
     def __repr__(self):
         return f'<UserFavorite {self.user_id}-{self.document_id}>'
+
+
+class PermissionConfigModel(db.Model):
+    """目录权限配置模型"""
+    __tablename__ = 'permission_configs'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    directory_id = Column(UUID(as_uuid=True), ForeignKey('directories.id', ondelete='CASCADE'), nullable=False, unique=True, index=True)
+    rules = Column(JSON, nullable=False, default=list)
+    version = Column(Integer, default=0, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    directory = relationship("DirectoryModel", backref="permission_config", uselist=False)
+
+    def __repr__(self):
+        return f'<PermissionConfig directory={self.directory_id} version={self.version}>'
+
+
+class AuditEventModel(db.Model):
+    """审计事件模型"""
+    __tablename__ = 'audit_events'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    actor = Column(String(100), nullable=False, index=True)
+    action = Column(String(100), nullable=False, index=True)
+    resource_type = Column(String(100), nullable=False, index=True)
+    resource_id = Column(String(200), nullable=False, index=True)
+    # 注意：SQLAlchemy 声明式模型中 'metadata' 是保留名称，这里使用 'meta_data'
+    meta_data = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+    def __repr__(self):
+        return f'<AuditEvent {self.action} {self.resource_type}:{self.resource_id}>'

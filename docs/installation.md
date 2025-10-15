@@ -224,7 +224,7 @@ pytest tests/
 
 ### 3. 访问应用
 - **前端应用**: http://localhost:3000
-- **API 文档**: http://localhost:5000/docs
+- **API 文档**: http://localhost:5000/api/v1/docs/
 - **管理界面**: http://localhost:3000/admin
 
 ## 🔧 常见问题

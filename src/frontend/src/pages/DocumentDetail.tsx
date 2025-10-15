@@ -54,10 +54,10 @@ const DocumentDetail: React.FC = () => {
       setError(null);
       const response = await DocumentService.getDocument(documentId);
       
-      if (response.success && response.document) {
-        setDocument(response.document);
+      if (response.success && response.data) {
+        setDocument(response.data);
       } else {
-        setError("文档不存在或已被删除");
+        setError(response.message || "文档不存在或已被删除");
       }
     } catch (error) {
       console.error("加载文档详情失败:", error);
@@ -72,13 +72,19 @@ const DocumentDetail: React.FC = () => {
 
     try {
       setDownloading(true);
-      const response = await DocumentService.downloadDocument(document.id);
+      const blob = await DocumentService.downloadDocument(document.id);
       
-      if (response.success) {
-        message.success("文档下载成功");
-      } else {
-        message.error(response.message || "下载文档失败");
-      }
+      // 创建下载链接
+      const url = window.URL.createObjectURL(blob);
+      const a = window.document.createElement('a');
+      a.href = url;
+      a.download = document.title || 'document';
+      window.document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      window.document.body.removeChild(a);
+      
+      message.success("文档下载成功");
     } catch (error) {
       console.error("下载文档失败:", error);
       message.error("下载文档失败，请稍后重试");

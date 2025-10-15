@@ -17,8 +17,16 @@ class User:
     email: str
     password_hash: str
     role: str
-    created_at: datetime
-    updated_at: datetime
+    # 扩展资料字段
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    department: Optional[str] = None
+    position: Optional[str] = None
+    avatar_url: Optional[str] = None
+    # 为了避免 dataclass 生成 __init__ 时的“non-default argument follows default”错误，
+    # 将时间字段声明为可选并提供默认值，由自定义 __init__ 负责填充。
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     
     def __init__(
         self,
@@ -27,6 +35,11 @@ class User:
         password_hash: str,
         role: str = 'user',
         id: Optional[str] = None,
+        full_name: Optional[str] = None,
+        phone: Optional[str] = None,
+        department: Optional[str] = None,
+        position: Optional[str] = None,
+        avatar_url: Optional[str] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None
     ):
@@ -35,6 +48,11 @@ class User:
         self.email = email
         self.password_hash = password_hash
         self.role = role
+        self.full_name = full_name
+        self.phone = phone
+        self.department = department
+        self.position = position
+        self.avatar_url = avatar_url
         self.created_at = created_at or datetime.utcnow()
         self.updated_at = updated_at or datetime.utcnow()
     

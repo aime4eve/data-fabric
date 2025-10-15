@@ -9,6 +9,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, decode
 from domain.entities.user import User
 from domain.repositories.user_repository import UserRepository
 from shared_kernel.exceptions.auth_exceptions import AuthenticationError, AuthorizationError
+from shared_kernel.utils.validators import validate_email
 
 
 class AuthService:
@@ -67,11 +68,12 @@ class AuthService:
         if not username.strip() or not email.strip() or not password.strip():
             raise AuthenticationError("用户名、邮箱和密码不能为空")
         
-        # 邮箱格式验证
-        import re
-        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if not re.match(email_pattern, email):
-            raise AuthenticationError("邮箱格式不正确")
+        # 邮箱格式与可达性校验（IDN/MX）
+        # 使用环境默认策略决定是否启用可达性检查
+        ok, normalized_email, err = validate_email(email, allow_empty=False)
+        if not ok:
+            raise AuthenticationError(err or "邮箱格式不正确")
+        email = normalized_email or email
         
         # 密码强度验证
         if len(password) < 6:

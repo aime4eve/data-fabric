@@ -33,8 +33,10 @@
     "types": ["jest", "@testing-library/jest-dom", "node"]
   },
   "include": [
-    "src",
-    "api",
-    "tests"
+    "src/**/*.tsx",
+    "src/**/*.ts",
+    "api/**/*.ts",d
+    "tests/**/*.ts",
+    "../../tests/bak/e2e/frontend/**/*.ts"
   ]
 }

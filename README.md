@@ -304,6 +304,10 @@ curl http://localhost:5000/health
 
 # 预期响应
 {"status": "healthy", "service": "knowledge-base-api"}
+
+# 访问API文档
+# API文档: http://localhost:5000/api/v1/docs/
+# Swagger JSON: http://localhost:5000/api/v1/swagger.json
 ```
 
 #### 5.2 前端访问

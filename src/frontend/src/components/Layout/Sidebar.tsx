@@ -10,6 +10,7 @@ import {
   ShareAltOutlined,
   FolderOutlined,
   SettingOutlined,
+  FolderOpenOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -37,6 +38,12 @@ export const Sidebar: React.FC = () => {
       icon: <FolderOutlined />,
       label: '分类管理',
       onClick: () => navigate('/categories'),
+    },
+    {
+      key: '/file-manager',
+      icon: <FolderOpenOutlined />,
+      label: '文件管理',
+      onClick: () => navigate('/file-manager'),
     },
     {
       key: '/search',

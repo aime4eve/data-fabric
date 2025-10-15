@@ -94,7 +94,7 @@ check_backend_status() {
             fi
             
             # 检查API文档
-            if curl -s http://localhost:5000/docs > /dev/null 2>&1; then
+            if curl -s http://localhost:5000/api/v1/docs/ > /dev/null 2>&1; then
                 echo -e "${GREEN}   📚 API文档: 可访问${NC}"
             else
                 echo -e "${YELLOW}   ⚠️  API文档: 不可访问${NC}"
@@ -247,7 +247,7 @@ show_overall_status() {
     echo -e "${PURPLE}🌐 访问地址:${NC}"
     echo "  📱 前端应用: http://localhost:3000"
     echo "  🔌 后端API: http://localhost:5000"
-    echo "  📚 API文档: http://localhost:5000/docs"
+    echo "  📚 API文档: http://localhost:5000/api/v1/docs/"
     echo "  ❤️  健康检查: http://localhost:5000/health"
     
     echo "├─────────────────────────────────────────────────────────────┤"

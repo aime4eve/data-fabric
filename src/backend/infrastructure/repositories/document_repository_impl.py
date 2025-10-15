@@ -26,7 +26,7 @@ class DocumentRepositoryImpl(DocumentRepository):
             existing_model.content_path = document.content_path
             existing_model.category_id = uuid.UUID(document.category_id)
             existing_model.author_id = uuid.UUID(document.author_id)
-            existing_model.status = document.status.value
+            existing_model.status = document.status.value if isinstance(document.status, DocumentStatus) else document.status
             existing_model.doc_metadata = document.metadata
             existing_model.updated_at = document.updated_at
             model = existing_model
@@ -69,9 +69,15 @@ class DocumentRepositoryImpl(DocumentRepository):
         models = DocumentModel.query.filter_by(status=status.value).all()
         return [self._model_to_entity(model) for model in models]
     
+    def count_by_status(self, status: str) -> int:
+        """根据状态计算文档数量"""
+        return DocumentModel.query.filter_by(status=status).count()
+
     def find_all(self, page: int = 1, size: int = 20) -> List[Document]:
         """分页查找所有文档"""
-        models = DocumentModel.query.paginate(
+        models = DocumentModel.query.filter(
+            DocumentModel.status != DocumentStatus.DELETED.value
+        ).paginate(
             page=page, per_page=size, error_out=False
         ).items
         return [self._model_to_entity(model) for model in models]
@@ -172,10 +178,10 @@ class DocumentRepositoryImpl(DocumentRepository):
         return self.save(document)
     
     def delete(self, document_id: str) -> bool:
-        """删除文档"""
+        """软删除文档"""
         model = DocumentModel.query.filter_by(id=document_id).first()
         if model:
-            db.session.delete(model)
+            model.status = DocumentStatus.DELETED.value
             db.session.commit()
             return True
         return False
@@ -230,6 +236,9 @@ class DocumentRepositoryImpl(DocumentRepository):
     
     def _model_to_entity(self, model: DocumentModel) -> Document:
         """将模型转换为实体"""
+        if not model:
+            return None
+            
         metadata = model.doc_metadata or {}
         # 添加内容相关的元数据
         if hasattr(model, 'content_text') and model.content_text:
@@ -238,12 +247,13 @@ class DocumentRepositoryImpl(DocumentRepository):
             metadata['has_summary'] = True
             
         return Document(
-            id=model.id,
+            id=str(model.id),
             title=model.title,
             content_path=model.content_path,
-            category_id=model.category_id,
-            author_id=model.author_id,
-            status=DocumentStatus(model.status),
+            category_id=str(model.category_id),
+            author_id=str(model.author_id),
+            status=DocumentStatus(model.status) if model.status else None,
             created_at=model.created_at,
-            updated_at=model.updated_at
+            updated_at=model.updated_at,
+            metadata=metadata
         )
