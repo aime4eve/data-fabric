@@ -526,7 +526,7 @@ class TestAuthValidation:
 
     def test_validate_email_format(self):
         """Test email format validation."""
-        from api.utils.validation import validate_email
+        from shared_kernel.utils.validators import validate_email_ex
         
         valid_emails = [
             'test@example.com',
@@ -543,10 +543,35 @@ class TestAuthValidation:
         ]
         
         for email in valid_emails:
-            assert validate_email(email) is True
+            res = validate_email_ex(email, allow_empty=False, check_deliverability=False)
+            assert res['ok'] is True
+            assert res['code'] is None
+            assert res['reason'] is None
         
         for email in invalid_emails:
-            assert validate_email(email) is False
+            res = validate_email_ex(email, allow_empty=False, check_deliverability=False)
+            assert res['ok'] is False
+            assert res['reason'] == 'format_error'
+
+    def test_validate_email_reserved_tld(self):
+        """Test email with reserved/invalid domain format mapping (format_error)."""
+        from shared_kernel.utils.validators import validate_email_ex
+        # domain without valid TLD (simulates reserved or invalid TLD)
+        res = validate_email_ex('user@example.invalid', allow_empty=False, check_deliverability=False)
+        # email-validator may treat as invalid domain (format error)
+        assert res['ok'] is False
+        assert res['reason'] == 'format_error'
+        assert res['code'] in {'invalid_domain', 'invalid_email_format'}
+
+    def test_validate_email_nxdomain(self):
+        """Test deliverability NXDOMAIN mapping when check_deliverability enabled."""
+        from shared_kernel.utils.validators import validate_email_ex
+        # Use a domain that should not exist to trigger NXDOMAIN
+        email = 'user@nonexistent-domain-example-test-xyz-12345.com'
+        res = validate_email_ex(email, allow_empty=False, check_deliverability=True)
+        assert res['ok'] is False
+        assert res['reason'] == 'deliverability_error'
+        assert res['code'] in {'domain_not_found', 'mx_or_a_not_found', 'dns_unreachable'}
 
     def test_validate_password_strength(self):
         """Test password strength validation."""

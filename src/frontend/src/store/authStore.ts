@@ -2,7 +2,7 @@
  * 认证状态管理
  */
 import { create } from 'zustand';
-import { User } from '../types/auth';
+import { User, RegisterResponse } from '../types/auth';
 import { AuthService } from '../services/authService';
 
 interface AuthState {
@@ -22,6 +22,37 @@ interface AuthActions {
 }
 
 export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
+  // 根据后端返回的 code/reason 映射更明确的错误文案
+  // 若后端已提供 message，将优先使用 message；否则按 code/reason 生成
+  mapRegisterErrorMessage: (resp: RegisterResponse): string => {
+    const fallback = resp.message || '注册失败';
+    const code = resp.code;
+    const reason = resp.reason;
+
+    if (!code) {
+      return fallback;
+    }
+
+    const formatMap: Record<string, string> = {
+      invalid_email_format: '邮箱格式不正确',
+      invalid_domain: '邮箱域名不合法',
+      invalid_local_part: '邮箱本地部分不合法',
+      empty: '邮箱不能为空',
+    };
+    const deliverabilityMap: Record<string, string> = {
+      domain_not_found: '邮箱域名不存在（DNS NXDOMAIN）',
+      dns_unreachable: 'DNS 不可达或查询超时',
+      mx_or_a_not_found: '域名缺少 MX 或 A/AAAA 记录（不可投递）',
+    };
+
+    if (reason === 'format_error') {
+      return formatMap[code] || fallback;
+    }
+    if (reason === 'deliverability_error') {
+      return deliverabilityMap[code] || fallback;
+    }
+    return fallback;
+  },
   // 初始状态
   user: null,
   isAuthenticated: false,
@@ -79,8 +110,10 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
           isLoading: false,
         });
       } else {
+        const mapMessage = (useAuthStore.getState() as any).mapRegisterErrorMessage as (r: RegisterResponse) => string;
+        const errMsg = mapMessage ? mapMessage(response) : (response.message || '注册失败');
         set({
-          error: response.message,
+          error: errMsg,
           isLoading: false,
         });
       }

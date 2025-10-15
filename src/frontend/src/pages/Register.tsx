@@ -40,6 +40,7 @@ export const Register: React.FC = () => {
           <Alert
             message={error}
             type="error"
+            description="请检查邮箱格式或域名可达性"
             showIcon
             className="mb-4 error-message"
             data-testid="error-message"
