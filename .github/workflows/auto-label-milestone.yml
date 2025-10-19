@@ -1,0 +1,104 @@
+name: Auto label milestone v1.1 for Story issues
+
+on:
+  issues:
+    types: [opened, edited, labeled, reopened]
+  schedule:
+    - cron: '0 18 * * *' # 每天 02:00 CST (UTC+8) 回填扫描
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: auto-label-milestone-v1_1
+  cancel-in-progress: true
+
+jobs:
+  apply-on-event:
+    name: Apply on issue events
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.issue.state == 'open'
+    steps:
+      - name: Add milestone label on "story"
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const MILESTONE_LABEL = 'milestone:v1.1';
+            const STORY_LABEL = 'story';
+
+            // Ensure label exists in repo
+            const existing = await github.paginate(
+              github.rest.issues.listLabelsForRepo,
+              { owner, repo, per_page: 100 }
+            );
+            if (!existing.find(l => l.name === MILESTONE_LABEL)) {
+              try {
+                await github.rest.issues.createLabel({ owner, repo, name: MILESTONE_LABEL, color: 'ededed' });
+                core.info(`Created label: ${MILESTONE_LABEL}`);
+              } catch (e) {
+                core.info(`Label creation skipped or failed: ${e.message}`);
+              }
+            }
+
+            const issue = context.payload.issue;
+            if (!issue) return;
+            // Skip PRs
+            if (issue.pull_request) return;
+
+            const labels = issue.labels.map(l => l.name);
+            if (labels.includes(STORY_LABEL) && !labels.includes(MILESTONE_LABEL)) {
+              await github.rest.issues.addLabels({ owner, repo, issue_number: issue.number, labels: [MILESTONE_LABEL] });
+              core.info(`Added ${MILESTONE_LABEL} to #${issue.number}`);
+            } else {
+              core.info(`No action for #${issue.number}`);
+            }
+
+  backfill:
+    name: Backfill missing labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add label to backlog issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const MILESTONE_LABEL = 'milestone:v1.1';
+            const STORY_LABEL = 'story';
+
+            // Ensure label exists in repo
+            const existing = await github.paginate(
+              github.rest.issues.listLabelsForRepo,
+              { owner, repo, per_page: 100 }
+            );
+            if (!existing.find(l => l.name === MILESTONE_LABEL)) {
+              try {
+                await github.rest.issues.createLabel({ owner, repo, name: MILESTONE_LABEL, color: 'ededed' });
+                core.info(`Created label: ${MILESTONE_LABEL}`);
+              } catch (e) {
+                core.info(`Label creation skipped or failed: ${e.message}`);
+              }
+            }
+
+            // List all open issues labeled 'story'
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: 'open', labels: STORY_LABEL, per_page: 100,
+            });
+
+            let updated = 0;
+            for (const issue of issues) {
+              // Skip PRs
+              if (issue.pull_request) continue;
+              const labels = (issue.labels || []).map(l => l.name);
+              if (!labels.includes(MILESTONE_LABEL)) {
+                await github.rest.issues.addLabels({ owner, repo, issue_number: issue.number, labels: [MILESTONE_LABEL] });
+                updated++;
+              }
+            }
+            core.info(`Backfill complete. Updated: ${updated} issue(s).`);
