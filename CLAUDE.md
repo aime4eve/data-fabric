@@ -40,13 +40,17 @@ cd knowledge-graph
 cd src/backend
 poetry install                          # 安装依赖
 python main.py                          # 启动开发服务器 (port 5000)
-pytest                                  # 运行测试
+pytest                                  # 运行所有测试
+pytest -m unit                          # 仅运行单元测试
+pytest -m "not slow"                    # 跳过慢速测试
+black .                                 # 代码格式化
 
 # 前端
 cd src/frontend
 pnpm install                            # 安装依赖
 pnpm dev                                # 启动开发服务器 (port 3000)
 pnpm test                               # 运行测试
+pnpm build                              # 构建生产版本
 
 # Docker 部署
 docker-compose up -d                    # 启动所有服务
@@ -89,10 +93,11 @@ src/
 - 时间格式统一使用北京时间 (UTC+8)
 
 ### knowledge-graph
-- 端口配置集中管理：`config/ports.yml`
+- 端口配置：后端 5000，前端 3000（集中管理于 `config/ports.yml`）
 - 后端使用 Poetry 管理依赖，前端使用 pnpm
 - 遵循 DDD 分层约束，领域层不依赖基础设施层
-- 端口管理工具：`python3 scripts/manage_ports.py show`
+- 代码格式化：后端 `black`（line-length=88），前端 Prettier
+- pytest 测试标记：`unit`、`integration`、`system`、`slow`、`security`
 
 ## 子项目文档
 

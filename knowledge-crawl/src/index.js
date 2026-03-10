@@ -21,7 +21,7 @@ const { writeManifest } = require('./utils/manifest-writer');
 const offlineArchiver = require('./services/offline-archiver');
 const indexGenerator = require('./services/index-generator');
 const path = require('path');
-const { createLogger, setLogContext } = require('./utils/logger');
+const { createLogger, setLogContext, setLogLevel } = require('./utils/logger');
 const { loadConfig, getEffectiveConfig, validateConfig } = require('./utils/config');
 
 async function collectPhase1Evidence(domainQueue, context, config) {
@@ -371,8 +371,7 @@ async function main() {
   const cliConfig = parseArgsFromProcess();
 
   // 加载配置（从环境变量和 .env 文件）
-  const fileConfig = loadConfig();
-  const config = getEffectiveConfig(fileConfig, cliConfig);
+  const config = getEffectiveConfig(cliConfig);
 
   // 验证配置
   const validation = validateConfig(config);

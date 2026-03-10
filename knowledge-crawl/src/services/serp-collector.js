@@ -543,16 +543,17 @@ async function collectSerpResults(queries, context, config) {
   }
 
   return allResults;
-} finally {
-  // 根据 keepBrowser 选项决定是否关闭浏览器
-  if (browser) {
-    if (keepBrowser) {
-      console.log('  - 采集完成，浏览器保持打开状态');
-      console.log('  💡 可以直接再次运行程序继续采集');
-    } else {
-      console.log('  - 采集完成，正在关闭浏览器...');
-      await browser.close();
-      console.log('  ✓ 浏览器已关闭');
+  } finally {
+    // 根据 keepBrowser 选项决定是否关闭浏览器
+    if (browser) {
+      if (keepBrowser) {
+        console.log('  - 采集完成，浏览器保持打开状态');
+        console.log('  💡 可以直接再次运行程序继续采集');
+      } else {
+        console.log('  - 采集完成，正在关闭浏览器...');
+        await browser.close();
+        console.log('  ✓ 浏览器已关闭');
+      }
     }
   }
 }
