@@ -1,0 +1,33 @@
+{
+  "name": "vendor-portal-collector",
+  "version": "0.1.0",
+  "description": "Phase 0 厂商门户搜索采集系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test tests/*.test.js",
+    "test:verbose": "node --test --reporter=spec tests/*.test.js",
+    "collect": "node src/index.js --source-doc"
+  },
+  "keywords": [
+    "vendor",
+    "portal",
+    "collector",
+    "google-search",
+    "playwright"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "csv-parse": "^6.1.0",
+    "dotenv": "^17.3.1",
+    "p-limit": "^3.1.0",
+    "single-file-cli": "^2.0.83"
+  }
+}

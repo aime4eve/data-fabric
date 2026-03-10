@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp -r tests \"data-fabric/knowledge-crawl/\")",
+      "Bash(cp -r docs \"data-fabric/knowledge-crawl/\")",
+      "Bash(cp -r openspec \"data-fabric/knowledge-crawl/\")"
+    ]
+  }
+}
