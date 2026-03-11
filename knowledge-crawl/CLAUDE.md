@@ -98,10 +98,15 @@ src/
 │   ├── vendor-aggregator.js    # [Phase 1] 厂商档案聚合与 vendors.csv 输出
 │   ├── captcha-handler.js      # 验证码检测与处理
 │   ├── llm-processor.js        # [Phase 2] LLM API 客户端（DeepSeek/OpenAI 兼容）
-│   └── phase2-enricher.js      # [Phase 2] LLM 增强处理（AI 标签、关键人物）
+│   ├── phase2-enricher.js      # [Phase 2] LLM 增强处理（AI 标签、关键人物）
+│   ├── offline-archiver.js     # [Phase 3] 离线归档（MHTML 下载）
+│   └── index-generator.js      # [Phase 3] 离线索引页生成（HTML）
 └── utils/
     ├── cli.js                  # CLI 参数解析
+    ├── config.js               # [Phase 4] 配置集中管理（环境变量 + CLI + .env）
     ├── context.js              # 运行上下文管理
+    ├── concurrency.js          # [Phase 4] 并发控制（带指数退避的重试）
+    ├── logger.js               # [Phase 4] 结构化日志
     ├── time.js                 # 北京时间工具
     ├── url-normalizer.js       # URL 归一化
     ├── csv-writer.js           # CSV 写入
@@ -127,7 +132,7 @@ vendors.csv → LLM 联系方式增强 → AI 标签推断 → 意向评分 → 
 
 **Phase 3:**
 ```
-URL 清单 → 离线资源下载 (MHTML) → download_history.csv (增量) → offline_archive/ & offline_index.html
+URL 清单 → 离线资源下载 (MHTML) → download_history.csv (增量) → 索引页生成 → offline_archive/ & offline_index.html
 ```
 
 ## 关键约束
@@ -248,4 +253,5 @@ npm run test:verbose
 - Phase 0 规格: [.trae/specs/design-phase0-vendor-portal-collector/](.trae/specs/design-phase0-vendor-portal-collector/)
 - Phase 1 规格: [.trae/specs/design-phase1-vendor-evidence-enrichment/](.trae/specs/design-phase1-vendor-evidence-enrichment/)
 - Phase 2 规格: [.trae/specs/design-phase2-intelligence-enrichment/](.trae/specs/design-phase2-intelligence-enrichment/)
-- Phase 4 规格: [openspec/changes/phase4-performance-engineering/](openspec/changes/phase4-performance-engineering/)
+- Phase 3 规格: [openspec/changes/archive/2026-03-09-phase3-offline-archive/](openspec/changes/archive/2026-03-09-phase3-offline-archive/)
+- Phase 4 规格: [openspec/changes/archive/2026-03-10-phase4-performance-engineering/](openspec/changes/archive/2026-03-10-phase4-performance-engineering/)

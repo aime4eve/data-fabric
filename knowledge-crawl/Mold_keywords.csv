@@ -1,0 +1,30 @@
+category,keyword,synonyms
+Core,Mold risk prediction,mold growth forecast; mold hazard analysis
+Core,Humidity monitoring,humidity tracking; moisture measurement
+Core,Temperature sensors,thermal sensors; climate probes
+Core,Dew point calculation,condensation point; moisture threshold
+Core,Indoor air quality,IAQ; air condition monitoring
+Core,Smart hygrometer,digital hygrometer; humidity sensor
+Core,Thermohygrometer,temperature-humidity meter; climate monitor
+Core,Wireless sensor,Bluetooth sensor; WiFi sensor
+Core,IoT mold prevention,smart mold control; connected mold monitoring
+Technical,Relative humidity (RH),humidity percentage; moisture ratio
+Technical,Microbial VOC detection (mVOCs),mold VOC sensing; microbial gas detection
+Technical,Thermal imaging camera,infrared camera; heat map sensor
+Technical,Data logging,environmental recording; sensor history
+Technical,Sensor calibration,accuracy adjustment; device tuning
+Technical,Environmental monitoring system,climate monitoring; building environment sensors
+Technical,Smart home integration,home automation; connected devices
+Technical,Bluetooth/WiFi connectivity,wireless connection; smart link
+Technical,Cloud-based alerts,online notifications; remote warnings
+Technical,Energy-efficient ventilation,smart HVAC; optimized airflow
+Application,Home mold prevention,household mold control; domestic mold monitoring
+Application,Building inspection tools,facility audit devices; construction risk sensors
+Application,Facility management sensors,property monitoring; workplace environment sensors
+Application,Basement humidity control,cellar moisture monitoring; underground dampness control
+Application,Bathroom condensation monitoring,shower humidity tracking; washroom moisture alerts
+Application,HVAC optimization,air system tuning; climate control efficiency
+Application,Smart indoor climate,connected climate control; automated air regulation
+Application,Air quality alerts,environment notifications; pollution warnings
+Application,Moisture risk assessment,wetness evaluation; dampness analysis
+Application,Hidden mold detection,concealed mold sensing; behind-wall mold risk

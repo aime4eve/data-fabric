@@ -3,6 +3,7 @@
  * 使用 Playwright 执行搜索并解析结果
  */
 
+const path = require('path');
 const { detectCaptchaChallenge } = require('./captcha-handler');
 
 // 验证码手动验证超时时间：10 分钟（600000 毫秒）
@@ -401,6 +402,98 @@ async function searchWithPlaywright(page, query, runId, options = {}) {
 }
 
 /**
+ * Phase 0 首页截图功能
+ * 对候选域名的首页进行首屏截图
+ *
+ * @param {Object} page - Playwright page 对象
+ * @param {string[]} domains - 域名数组
+ * @param {string} screenshotDir - 截图保存目录
+ * @param {string} runId - 运行 ID
+ * @returns {Promise<Object[]>} 截图结果数组
+ */
+async function captureHomeScreenshots(page, domains, screenshotDir, runId) {
+  const fs = require('fs');
+  const path = require('path');
+  const results = [];
+
+  // 处理空数组
+  if (!domains || domains.length === 0) {
+    return results;
+  }
+
+  // 处理 null page
+  if (!page) {
+    for (const domain of domains) {
+      results.push({
+        domain,
+        status: 'error',
+        error_reason: 'Page object is null',
+        screenshot_path: null
+      });
+    }
+    return results;
+  }
+
+  // 确保截图目录存在
+  if (!fs.existsSync(screenshotDir)) {
+    fs.mkdirSync(screenshotDir, { recursive: true });
+  }
+
+  console.log(`\n  📸 开始首页截图 (${domains.length} 个域名)...`);
+
+  for (let i = 0; i < domains.length; i++) {
+    const domain = domains[i];
+    const screenshotPath = path.join(screenshotDir, `${domain}_home.png`);
+
+    console.log(`    [${i + 1}/${domains.length}] 截图: ${domain}`);
+
+    try {
+      // 访问首页
+      const url = `https://${domain}`;
+      await page.goto(url, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30000
+      });
+
+      // 等待页面稳定
+      await randomDelay(1000, 2000);
+
+      // 截取首屏（非全页）
+      await page.screenshot({
+        path: screenshotPath,
+        fullPage: false
+      });
+
+      results.push({
+        domain,
+        status: 'success',
+        error_reason: null,
+        screenshot_path: screenshotPath
+      });
+
+      console.log(`    ✓ 已保存: ${screenshotPath}`);
+
+      // 请求间延迟，避免过快
+      await randomDelay(2000, 4000);
+
+    } catch (error) {
+      results.push({
+        domain,
+        status: 'error',
+        error_reason: error.message,
+        screenshot_path: null
+      });
+
+      console.log(`    ✗ 截图失败: ${error.message}`);
+      // 继续下一个域名，不中断流程
+    }
+  }
+
+  console.log(`  📸 截图完成: ${results.filter(r => r.status === 'success').length}/${domains.length} 成功\n`);
+  return results;
+}
+
+/**
  * 生成模拟的 SERP 数据（用于测试）
  * @param {string} query - 搜索查询
  * @param {string} runId - 运行 ID
@@ -542,7 +635,25 @@ async function collectSerpResults(queries, context, config) {
     }
   }
 
-  return allResults;
+      // Phase 0 首页截图（在浏览器关闭前执行）
+      if (page && allResults.length > 0) {
+        // 提取唯一域名列表
+        const domainSet = new Set();
+        const domainList = [];
+        for (const result of allResults) {
+          if (result.domain && !domainSet.has(result.domain)) {
+            domainSet.add(result.domain);
+            domainList.push(result.domain);
+          }
+        }
+
+        if (domainList.length > 0) {
+          const screenshotDir = path.join(context.outputPath || './outputs', context.runId, 'screenshots');
+          await captureHomeScreenshots(page, domainList, screenshotDir, context.runId);
+        }
+      }
+
+      return allResults;
   } finally {
     // 根据 keepBrowser 选项决定是否关闭浏览器
     if (browser) {
@@ -569,6 +680,7 @@ module.exports = {
   humanLikeScroll,
   searchWithPlaywright,
   generateMockResults,
+  captureHomeScreenshots,
   collectSerpResults,
   CAPTCHA_INDICATORS
 };

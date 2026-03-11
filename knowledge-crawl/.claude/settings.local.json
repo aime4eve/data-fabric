@@ -38,7 +38,12 @@
       "Bash(npm install p-limit dotenv --save)",
       "Bash(npm install p-limit@3 --save)",
       "Bash(mkdir -p \"data-fabric/knowledge-crawl\")",
-      "Bash(cp -r src \"data-fabric/knowledge-crawl/\")"
+      "Bash(cp -r src \"data-fabric/knowledge-crawl/\")",
+      "Bash(npx playwright:*)",
+      "Bash(openspec new:*)",
+      "Bash(openspec status:*)",
+      "Bash(openspec instructions:*)",
+      "Bash(pnpm install:*)"
     ]
   }
 }
