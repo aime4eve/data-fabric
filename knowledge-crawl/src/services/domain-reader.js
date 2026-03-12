@@ -3,6 +3,8 @@
  * 读取 domains_agg.csv 并构建候选域名处理队列
  *
  * Phase 1 输入模块
+ *
+ * 注意: EVIDENCE_PATHS 已移除，paths 由 path-discovery 模块动态发现
  */
 
 const fs = require('fs');
@@ -11,17 +13,8 @@ const path = require('path');
 // 必需字段列表
 const REQUIRED_FIELDS = ['run_id', 'domain_key', 'domain'];
 
-// 约定证据页路径（最多 8 页）
-const EVIDENCE_PATHS = [
-  '/',
-  '/products',
-  '/product',
-  '/solutions',
-  '/downloads',
-  '/download',
-  '/contact',
-  '/about'
-];
+// 固定路径已移除，改用 path-discovery 模块动态发现
+// 见 src/services/path-discovery/
 
 /**
  * 验证 domains_agg.csv 文件
@@ -172,6 +165,7 @@ function buildDomainQueue(domains, runId, options = {}) {
     : sorted;
 
   // 构建队列项
+  // paths 字段将在 Phase 1 中由 path-discovery 模块动态填充
   return limited.map(domain => ({
     run_id: runId,
     domain_key: domain.domain_key,
@@ -182,8 +176,9 @@ function buildDomainQueue(domains, runId, options = {}) {
     queries: domain.queries || '',
     phase0_score: domain.score || 0,
     phase0_reason: domain.reason || '',
-    paths: [...EVIDENCE_PATHS],
-    evidence_pages: [],  // 抓取后填充
+    paths: [],            // 由 path-discovery 动态发现
+    path_source: null,    // 'sitemap' | 'navigation' | null
+    evidence_pages: [],   // 抓取后填充
     extracted_data: null, // 抽取后填充
     error_reason: ''      // 错误时填充
   }));
@@ -193,6 +188,6 @@ module.exports = {
   validateDomainsFile,
   readDomainsAgg,
   buildDomainQueue,
-  EVIDENCE_PATHS,
   REQUIRED_FIELDS
+  // EVIDENCE_PATHS 已移除，使用 path-discovery 模块
 };

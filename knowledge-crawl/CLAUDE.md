@@ -92,6 +92,12 @@ src/
 │   ├── domain-aggregator.js    # 域名聚合（按 domain_key 去重）
 │   ├── scorer.js               # 评分服务（排名+命中+关键词）
 │   ├── domain-reader.js        # [Phase 1] 读取 domains_agg.csv，构建候选队列
+│   ├── path-discovery/         # [Phase 1] 智能路径发现模块
+│   │   ├── index.js            # 主入口：discoverPaths()
+│   │   ├── sitemap-fetcher.js  # sitemap.xml 获取与解析
+│   │   ├── nav-extractor.js    # 导航链接提取（Playwright）
+│   │   ├── path-filter.js      # URL 分类、评分与配额管理
+│   │   └── url-normalizer.js   # URL 清洗、分组与代表选择
 │   ├── robots-checker.js       # [Phase 1] robots.txt 合规检查
 │   ├── evidence-fetcher.js     # [Phase 1] 证据页抓取与文本清洗
 │   ├── contact-extractor.js    # [Phase 1] 联系方式抽取（邮箱、电话、公司名等）
@@ -113,6 +119,36 @@ src/
     └── manifest-writer.js      # 运行清单写入
 ```
 
+### 智能路径发现 (Path Discovery)
+
+Phase 1 使用智能路径发现替代固定路径列表：
+
+**回退链：** sitemap.xml → 导航提取 → 跳过域名
+
+```
+Domain → sitemap.xml 可用? → 使用 sitemap 路径
+              ↓ 否
+         导航可提取? → 使用导航链接
+              ↓ 否
+         跳过域名（记录警告）
+```
+
+**评分公式：**
+```
+finalScore = typeWeight × 0.35 + relevanceScore × 0.30 + sitemapPriority × 0.20 + depthFactor × 0.15
+```
+
+**配额分配（总计 15 条）：**
+| 页面类型 | 最小 | 最大 |
+|----------|------|------|
+| HOME | 1 | 1 |
+| CONTACT | 1 | 2 |
+| ABOUT | 1 | 2 |
+| PRODUCTS_LIST | 1 | 2 |
+| PRODUCT_DETAIL | 0 | 5 |
+| SOLUTIONS | 0 | 2 |
+| OTHER | 0 | 剩余 |
+
 ### 数据流
 
 **Phase 0:**
@@ -122,7 +158,7 @@ src/
 
 **Phase 1:**
 ```
-domains_agg.csv → 候选域名队列 → robots 合规检查 → 证据页抓取（含截图） → 联系方式抽取 → 厂商档案聚合 → vendors.csv
+domains_agg.csv → 候选域名队列 → 智能路径发现 → robots 合规检查 → 证据页抓取（含截图） → 联系方式抽取 → 厂商档案聚合 → vendors.csv
 ```
 
 **Phase 2:**
@@ -152,7 +188,7 @@ URL 清单 → 离线资源下载 (MHTML) → download_history.csv (增量) → 
   - 每次查询后随机等待 1-5 秒
 - **SERP 提取**：优先使用 DOM 提取（`page.evaluate`），失败时回退到 HTML 正则解析
 - **robots.txt 合规**：Phase 1 抓取前检查 robots.txt，禁止路径跳过并记录原因
-- **证据页路径**：每个域名最多抓取 8 个约定路径（/、/products、/product、/solutions、/downloads、/download、/contact、/about）
+- **证据页路径**：Phase 1 使用智能路径发现（sitemap.xml → 导航提取 → 跳过），固定 8 路径仅作为回退
 
 ## 关键词文件格式
 
@@ -203,7 +239,7 @@ LLM 增强厂商档案，额外字段：ai_tags, intent_score, key_people, detec
 
 ## 测试
 
-使用 Node.js 内置测试框架（`node:test`），位于 `tests/` 目录：
+使用 Node.js 内置测试框架（`node:test`），位于 `tests/` 目录（28 个测试文件）：
 
 ```bash
 # 运行所有测试
@@ -218,7 +254,7 @@ npm run test:verbose
 
 ## OpenSpec 工作流
 
-项目使用 OpenSpec 进行规格驱动开发，相关命令：
+项目使用 OpenSpec 进行规格驱动开发：
 
 | 命令 | 说明 |
 |------|------|
@@ -227,7 +263,8 @@ npm run test:verbose
 | `/openspec:apply <name>` | 应用变更实现 |
 | `/openspec:archive <name>` | 归档已完成变更 |
 
-规格文档位于 `openspec/` 目录，详见 [OpenSpec-使用指南.md](docs/OpenSpec-使用指南.md)。
+**当前活跃变更：**
+- 无（智能路径发现已完成并归档）
 
 ## 目录结构
 
@@ -236,10 +273,10 @@ npm run test:verbose
 │   ├── index.js            # 主入口
 │   ├── services/           # 业务服务
 │   └── utils/              # 工具函数
-├── tests/                  # 测试文件（25 个测试文件）
+├── tests/                  # 测试文件（28 个测试文件）
 ├── openspec/               # OpenSpec 规格与变更
 │   ├── specs/              # 功能规格
-│   └── changes/            # 变更提案
+│   └── changes/            # 变更提案（活跃）与归档
 ├── 2602/                   # 产品规格文档（按产品分类）
 ├── outputs/                # 采集输出（按 run_id 分批）
 │   └── <run_id>/           # 单次运行输出

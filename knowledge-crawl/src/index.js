@@ -23,11 +23,17 @@ const indexGenerator = require('./services/index-generator');
 const path = require('path');
 const { createLogger, setLogContext, setLogLevel } = require('./utils/logger');
 const { loadConfig, getEffectiveConfig, validateConfig } = require('./utils/config');
+const { discoverPaths } = require('./services/path-discovery');
 
-async function collectPhase1Evidence(domainQueue, context, config) {
+async function collectPhase1Evidence(domainQueue, context, config, keywords) {
   const evidenceMap = new Map();
   let browser = null;
   let page = null;
+
+  const logger = createLogger({
+    level: process.env.LOG_LEVEL || 'info',
+    context: { runId: context.runId, phase: 'phase1' }
+  });
 
   if (config.headful !== false) {
     try {
@@ -39,11 +45,35 @@ async function collectPhase1Evidence(domainQueue, context, config) {
       });
       page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
     } catch (error) {
-      console.log(`  - 警告: 无法启动 Phase1 浏览器，跳过证据抓取 (${error.message})`);
+      logger.warn(`无法启动 Phase1 浏览器，跳过证据抓取 (${error.message})`);
     }
   }
 
   for (const domainItem of domainQueue) {
+    logger.info(`处理域名: ${domainItem.domain}`);
+
+    // 使用 path-discovery 动态发现路径
+    const pathResult = await discoverPaths(domainItem.domain, {
+      keywords: keywords,
+      maxPaths: 15,
+      page: page,
+      timeout: 15000,
+      logger: logger
+    });
+
+    if (!pathResult.success || pathResult.paths.length === 0) {
+      logger.warn(`域名 ${domainItem.domain} 路径发现失败: ${pathResult.error || '无可用路径'}`);
+      domainItem.error_reason = pathResult.error || 'Path discovery failed';
+      evidenceMap.set(domainItem.domain_key, []);
+      continue;
+    }
+
+    // 更新 domainItem 的 paths
+    domainItem.paths = pathResult.paths;
+    domainItem.path_source = pathResult.source;
+
+    logger.info(`发现 ${pathResult.paths.length} 个路径 (来源: ${pathResult.source})`);
+
     const robotsInfo = { rules: {}, sitemaps: [] };
     const pages = page
       ? await fetchAllEvidencePages(
@@ -194,7 +224,8 @@ async function run(config) {
     logger.info(`读取 Phase1 vendors.csv: ${config.vendorsFile}`);
   } else {
     const domainQueue = buildDomainQueue(scoredDomains, context.runId, { maxDomains: config.maxDomains });
-    const evidenceMap = await collectPhase1Evidence(domainQueue, context, config);
+    // 传递 keywords 用于 path-discovery 的相关性评分
+    const evidenceMap = await collectPhase1Evidence(domainQueue, context, config, keywords);
     vendors = aggregateAllVendors(domainQueue, evidenceMap);
     writeVendorsCsv(vendors, vendorsCsvPath);
     logger.info(`Phase1 厂商档案: ${vendorsCsvPath}`);

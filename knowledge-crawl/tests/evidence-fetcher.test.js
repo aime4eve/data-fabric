@@ -12,7 +12,8 @@ const {
   createEvidenceRecord,
   fetchEvidencePage,
   fetchAllEvidencePages,
-  captureEvidenceScreenshot
+  captureEvidenceScreenshot,
+  extractPathFromUrl
 } = require('../src/services/evidence-fetcher');
 
 describe('evidence-fetcher', () => {
@@ -165,6 +166,44 @@ describe('evidence-fetcher', () => {
       const results = await fetchAllEvidencePages(null, ['/', '/contact'], 'example.com', {});
       // 应该返回错误记录或空数组
       assert.ok(Array.isArray(results));
+    });
+  });
+
+  describe('extractPathFromUrl', () => {
+    test('should extract path from full URL', () => {
+      const result = extractPathFromUrl('https://www.matix.cloud/hardware');
+      assert.strictEqual(result, '/hardware');
+    });
+
+    test('should extract path with query string from full URL', () => {
+      const result = extractPathFromUrl('https://example.com/products?id=123');
+      assert.strictEqual(result, '/products?id=123');
+    });
+
+    test('should return relative path unchanged', () => {
+      const result = extractPathFromUrl('/contact');
+      assert.strictEqual(result, '/contact');
+    });
+
+    test('should return relative path with query unchanged', () => {
+      const result = extractPathFromUrl('/products?page=2');
+      assert.strictEqual(result, '/products?page=2');
+    });
+
+    test('should handle root path URL', () => {
+      const result = extractPathFromUrl('https://example.com/');
+      assert.strictEqual(result, '/');
+    });
+
+    test('should handle null input', () => {
+      const result = extractPathFromUrl(null);
+      assert.strictEqual(result, null);
+    });
+
+    test('should handle invalid URL gracefully', () => {
+      // 无效 URL 应该返回原值
+      const result = extractPathFromUrl('not-a-valid-url');
+      assert.strictEqual(result, 'not-a-valid-url');
     });
   });
 });

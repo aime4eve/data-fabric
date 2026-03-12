@@ -142,14 +142,31 @@ async function captureEvidenceScreenshot(page, options = {}) {
  * 抓取单个证据页
  * @param {Object} page - Playwright page 对象
  * @param {string} domain - 域名
- * @param {string} path - 路径
+ * @param {string} path - 路径（相对路径或完整 URL）
  * @param {Object} options - 选项
  * @param {number} [options.timeout=30000] - 超时时间（毫秒）
  * @returns {Promise<Object>} 证据记录
  */
 async function fetchEvidencePage(page, domain, path, options = {}) {
   const timeout = options.timeout || DEFAULT_PAGE_TIMEOUT;
-  const url = `https://${domain}${path}`;
+
+  // 智能处理 path：支持完整 URL 或相对路径
+  let url;
+  let actualPath;
+  if (path && path.startsWith('http')) {
+    // path 已经是完整 URL（来自 path-discovery 模块）
+    url = path;
+    try {
+      const parsed = new URL(path);
+      actualPath = parsed.pathname + parsed.search;
+    } catch {
+      actualPath = path;
+    }
+  } else {
+    // path 是相对路径
+    url = `https://${domain}${path}`;
+    actualPath = path;
+  }
 
   try {
     // 导航前随机暂停
@@ -175,12 +192,12 @@ async function fetchEvidencePage(page, domain, path, options = {}) {
       screenshotDir: options.screenshotDir,
       runId: options.runId,
       domain,
-      pagePath: path
+      pagePath: actualPath
     });
 
     const record = createEvidenceRecord({
       domain,
-      path,
+      path: actualPath,
       url,
       text: truncatedText,
       statusCode: response ? response.status() : 200
@@ -190,7 +207,7 @@ async function fetchEvidencePage(page, domain, path, options = {}) {
   } catch (error) {
     return createEvidenceRecord({
       domain,
-      path,
+      path: actualPath,
       url,
       text: '',
       error
@@ -199,9 +216,27 @@ async function fetchEvidencePage(page, domain, path, options = {}) {
 }
 
 /**
+ * 从完整 URL 或路径中提取路径部分
+ * @param {string} pathOrUrl - 路径或完整 URL
+ * @returns {string} 路径部分
+ */
+function extractPathFromUrl(pathOrUrl) {
+  if (!pathOrUrl) return pathOrUrl;
+  if (pathOrUrl.startsWith('http')) {
+    try {
+      const parsed = new URL(pathOrUrl);
+      return parsed.pathname + parsed.search;
+    } catch {
+      return pathOrUrl;
+    }
+  }
+  return pathOrUrl;
+}
+
+/**
  * 抓取所有证据页
  * @param {Object} page - Playwright page 对象
- * @param {string[]} paths - 路径列表
+ * @param {string[]} paths - 路径列表（支持相对路径或完整 URL）
  * @param {string} domain - 域名
  * @param {Object} robotsInfo - robots.txt 信息
  * @param {Object} options - 选项
@@ -215,16 +250,20 @@ async function fetchAllEvidencePages(page, paths, domain, robotsInfo, options = 
   const results = [];
 
   for (const path of paths) {
+    // 提取路径部分用于 robots 检查
+    const pathForRobotsCheck = extractPathFromUrl(path);
+
     // 检查 robots.txt 合规性
     const { isPathAllowed } = require('./robots-checker');
-    const check = isPathAllowed(robotsInfo, path, 'MyBot');
+    const check = isPathAllowed(robotsInfo, pathForRobotsCheck, 'MyBot');
 
     if (!check.allowed) {
       // 记录跳过原因
+      const url = path.startsWith('http') ? path : `https://${domain}${path}`;
       results.push(createEvidenceRecord({
         domain,
-        path,
-        url: `https://${domain}${path}`,
+        path: pathForRobotsCheck,
+        url,
         text: '',
         error: new Error(`Robots.txt disallowed: ${check.reason}`)
       }));
@@ -248,5 +287,6 @@ module.exports = {
   fetchEvidencePage,
   fetchAllEvidencePages,
   randomDelay,
-  captureEvidenceScreenshot
+  captureEvidenceScreenshot,
+  extractPathFromUrl
 };
