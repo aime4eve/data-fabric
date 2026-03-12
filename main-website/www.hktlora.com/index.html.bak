@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物联网智能解决方案 - 首页</title>
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #FFFFFF;
+        }
+
+        /* 颜色方案 */
+        :root {
+            --primary-color: #2C5AA0;
+            --secondary-color: #E8E8E8;
+            --accent-color: #FF6B35;
+            --text-color: #333333;
+            --background-color: #FFFFFF;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background-color: var(--primary-color);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: var(--accent-color);
+        }
+
+        /* 英雄区域 */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1e4289 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            background-color: #E55A2B;
+            transform: translateY(-2px);
+        }
+
+        /* 特性展示 */
+        .features {
+            padding: 60px 0;
+            background-color: var(--secondary-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .feature-card h3 {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        /* 产品展示 - Swiper 覆盖样式 */
+        .products {
+            padding: 60px 0;
+            overflow: hidden; /* 防止滑动溢出 */
+        }
+
+        .products h2 {
+            text-align: center;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+        }
+
+        /* Swiper 容器样式 */
+        .swiper-container {
+            width: 100%;
+            padding: 0 50px 50px; /* 左右内边距为按钮留出空间，底部为分页器留空间 */
+            position: relative;
+        }
+        
+        .swiper-button-prev,
+        .swiper-button-next {
+            top: 50%;
+            transform: translateY(-100%); /* 向上偏移以抵消底部 padding 的影响，实现视觉居中 */
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            color: var(--primary-color);
+        }
+
+        .swiper-button-prev:after,
+        .swiper-button-next:after {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .swiper-button-prev {
+            left: 0;
+        }
+
+        .swiper-button-next {
+            right: 0;
+        }
+
+        .swiper-slide {
+            height: auto; /* 确保卡片高度一致 */
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+            background-color: white;
+            height: 100%; /* 撑满 Swiper slide 高度 */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            height: 200px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .product-content {
+            padding: 25px;
+            flex-grow: 1; /* 让内容区填充剩余空间 */
+        }
+
+        .product-content h3 {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .product-features {
+            list-style: none;
+        }
+
+        .product-features li {
+            padding: 5px 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .product-features li:before {
+            content: "✓";
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* 解决方案案例 */
+        .solutions {
+            padding: 60px 0;
+            background-color: var(--secondary-color);
+        }
+
+        .solutions h2 {
+            text-align: center;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+        }
+
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .solution-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .solution-card h3 {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .solution-benefits {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .benefits-list {
+            list-style: none;
+            font-size: 14px;
+        }
+
+        .benefits-list li {
+            padding: 3px 0;
+            color: #555;
+        }
+
+        .benefits-list li:before {
+            content: "•";
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        /* 解决方案按钮样式 */
+        .solution-link-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .solution-link-btn:hover {
+            background-color: #E55A2B;
+        }
+
+        /* 客户信任 */
+        .trust {
+            padding: 60px 0;
+        }
+
+        .trust h2 {
+            text-align: center;
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+        }
+
+        .trust-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .certifications {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .cert-item {
+            background-color: var(--secondary-color);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .partners {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .partner-item {
+            background-color: var(--secondary-color);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .testimonials {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .testimonial {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-left: 4px solid var(--accent-color);
+            background-color: white;
+        }
+
+        .testimonial p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .testimonial .author {
+            font-size: 12px;
+            color: #888;
+            text-align: right;
+        }
+
+        /* 页脚 */
+        .footer {
+            background-color: #333;
+            color: white;
+            padding: 40px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            font-family: 'Montserrat', Arial, sans-serif;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            padding: 5px 0;
+        }
+
+        .footer-section ul li a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #555;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-menu {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .hero-content h1 {
+                font-size: 28px;
+            }
+
+            .features-grid,
+            .products-grid,
+            .solutions-grid,
+            .trust-content {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="logo">IoT Smart Solutions</a>
+            <ul class="nav-menu">
+                <li><a href="#products">产品中心</a></li>
+                <li><a href="#solutions">解决方案</a></li>
+                <li><a href="#trust">客户案例</a></li>
+                <li><a href="#about">关于我们</a></li>
+                <li><a href="#contact">联系我们</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>专业物联网智能解决方案</h1>
+                <p>20年行业经验，服务全球客户</p>
+                <a href="#contact" class="cta-button">联系我们，获取定制化解决方案</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 特性展示 -->
+    <section class="features">
+        <div class="container">
+            <h2>核心优势</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔬</div>
+                    <h3>高精度传感器技术</h3>
+                    <p>采用先进的传感技术，确保数据精准可靠</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>智能数据分析平台</h3>
+                    <p>强大的数据处理和分析能力，提供决策支持</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛠️</div>
+                    <h3>定制化解决方案</h3>
+                    <p>根据客户需求提供个性化定制服务</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3>全球化服务网络</h3>
+                    <p>覆盖全球的服务网络，提供及时响应</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 产品展示 -->
+    <section class="products" id="products">
+        <div class="container">
+            <h2>产品中心</h2>
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="product-card">
+                            <div class="product-image">温湿度传感器系列</div>
+                            <div class="product-content">
+                                <h3>温湿度传感器系列</h3>
+                                <ul class="product-features">
+                                    <li>高精度监测（±0.5°C，±2%RH）</li>
+                                    <li>智能预警系统</li>
+                                    <li>数据分析平台</li>
+                                    <li>适用于仓储防霉</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="product-card">
+                            <div class="product-image">GPS追踪器系列</div>
+                            <div class="product-content">
+                                <h3>GPS追踪器系列</h3>
+                                <ul class="product-features">
+                                    <li>实时定位（≤5米精度）</li>
+                                    <li>轨迹记录功能</li>
+                                    <li>防盗预警系统</li>
+                                    <li>适用于资产管理</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="product-card">
+                            <div class="product-image">智慧农业传感器</div>
+                            <div class="product-content">
+                                <h3>智慧农业传感器</h3>
+                                <ul class="product-features">
+                                    <li>土壤监测功能</li>
+                                    <li>智能灌溉控制</li>
+                                    <li>生长数据分析</li>
+                                    <li>适用于智慧农业</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="product-card">
+                            <div class="product-image">定制化解决方案</div>
+                            <div class="product-content">
+                                <h3>定制化解决方案</h3>
+                                <ul class="product-features">
+                                    <li>一体化设计</li>
+                                    <li>按需开发</li>
+                                    <li>专业支持</li>
+                                    <li>适用于特殊项目</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 分页器 -->
+                <div class="swiper-pagination"></div>
+                <!-- 导航按钮 -->
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 解决方案案例 -->
+    <section class="solutions" id="solutions">
+        <div class="container">
+            <h2>解决方案</h2>
+            <div class="solutions-grid">
+                <div class="solution-card">
+                    <h3>仓储防霉解决方案</h3>
+                    <div class="solution-benefits">
+                        <h4>核心价值</h4>
+                        <ul class="benefits-list">
+                            <li>降低霉变损失80%</li>
+                            <li>节省防霉成本50%</li>
+                            <li>提高合规性，降低风险</li>
+                        </ul>
+                    </div>
+                    <a href="building_space_anti_mold_solution.html" class="solution-link-btn">了解更多</a>
+                </div>
+                <div class="solution-card">
+                    <h3>智慧畜牧管理</h3>
+                    <div class="solution-benefits">
+                        <h4>核心价值</h4>
+                        <ul class="benefits-list">
+                            <li>降低疾病死亡率30%</li>
+                            <li>提高繁殖效率20%</li>
+                            <li>减少人工成本40%</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="solution-card">
+                    <h3>能耗优化系统</h3>
+                    <div class="solution-benefits">
+                        <h4>核心价值</h4>
+                        <ul class="benefits-list">
+                            <li>降低能耗成本25%</li>
+                            <li>提高能效30%</li>
+                            <li>实现绿色运营</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="solution-card">
+                    <h3>资产安全追踪</h3>
+                    <div class="solution-benefits">
+                        <h4>核心价值</h4>
+                        <ul class="benefits-list">
+                            <li>降低资产丢失率80%</li>
+                            <li>提高资产利用率</li>
+                            <li>提高追踪效率</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 客户信任 -->
+    <section class="trust" id="trust">
+        <div class="container">
+            <h2>客户信任</h2>
+            <div class="trust-content">
+                <div class="trust-section">
+                    <h3>行业认证</h3>
+                    <div class="certifications">
+                        <div class="cert-item">ISO 9001质量管理体系认证</div>
+                        <div class="cert-item">CE产品认证</div>
+                        <div class="cert-item">RoHS环保认证</div>
+                        <div class="cert-item">IP67防护等级认证</div>
+                    </div>
+                </div>
+                <div class="trust-section">
+                    <h3>合作伙伴</h3>
+                    <div class="partners">
+                        <div class="partner-item">华为技术</div>
+                        <div class="partner-item">阿里云</div>
+                        <div class="partner-item">腾讯云</div>
+                        <div class="partner-item">百度智能云</div>
+                    </div>
+                </div>
+                <div class="trust-section">
+                    <h3>客户评价</h3>
+                    <div class="testimonials">
+                        <div class="testimonial">
+                            <p>"专业的技术团队，可靠的产品质量，为我们节省了大量管理成本。"</p>
+                            <div class="author">— 仓储物流集团</div>
+                        </div>
+                        <div class="testimonial">
+                            <p>"定制化服务非常到位，解决了我们的特殊需求，提高了运营效率。"</p>
+                            <div class="author">— 农业科技公司</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>关于我们</h3>
+                    <ul>
+                        <li><a href="#">公司简介</a></li>
+                        <li><a href="#">发展历程</a></li>
+                        <li><a href="#">团队介绍</a></li>
+                        <li><a href="#">企业文化</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>联系方式</h3>
+                    <ul>
+                        <li><a href="#">在线咨询</a></li>
+                        <li><a href="#">电话咨询</a></li>
+                        <li><a href="#">邮件联系</a></li>
+                        <li><a href="#">全球服务</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>技术支持</h3>
+                    <ul>
+                        <li><a href="#">产品文档</a></li>
+                        <li><a href="#">API接口</a></li>
+                        <li><a href="#">常见问题</a></li>
+                        <li><a href="#">技术支持</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>加入我们</h3>
+                    <ul>
+                        <li><a href="#">人才招聘</a></li>
+                        <li><a href="#">合作伙伴</a></li>
+                        <li><a href="#">投资合作</a></li>
+                        <li><a href="#">联系我们</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 IoT Smart Solutions. All rights reserved. | 隐私政策 | 使用条款</p>
+            </div>
+        </div>
+    </footer>
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        const swiper = new Swiper('.swiper-container', {
+            // 循环模式
+            loop: true,
+            // 自动播放
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+            // 分页器
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            // 导航按钮
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            // 响应式断点
+            breakpoints: {
+                // 当屏幕宽度 >= 320px
+                320: {
+                    slidesPerView: 1,
+                    spaceBetween: 20
+                },
+                // 当屏幕宽度 >= 768px
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 30
+                },
+                // 当屏幕宽度 >= 1024px
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 30
+                }
+            }
+        });
+    </script>
+</body>
+</html>
