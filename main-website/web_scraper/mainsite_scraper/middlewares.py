@@ -8,8 +8,8 @@ from user_agents import parse
 import random
 
 
-class MilesightScraperSpiderMiddleware:
-    """爬虫中间件"""
+class GenericPortalSpiderMiddleware:
+    """通用爬虫中间件"""
 
     @classmethod
     def from_crawler(cls, crawler):

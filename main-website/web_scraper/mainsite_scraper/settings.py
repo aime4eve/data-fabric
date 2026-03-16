@@ -1,11 +1,14 @@
-# Scrapy settings for milesight_scraper project
+# Scrapy settings for generic_portal_scraper project
 #
 # 本爬虫仅供学习研究使用，请遵守目标网站的robots协议及所有法律法规。不得用于任何商业用途或非法用途。
+#
+# 通用企业门户网站爬虫配置
+# 作者：伍志勇
 
-BOT_NAME = 'milesight_scraper'
+BOT_NAME = 'generic_portal_scraper'
 
-SPIDER_MODULES = ['milesight_scraper.spiders']
-NEWSPIDER_MODULE = 'milesight_scraper.spiders'
+SPIDER_MODULES = ['mainsite_scraper.spiders']
+NEWSPIDER_MODULE = 'mainsite_scraper.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -31,7 +34,7 @@ TELNETCONSOLE_ENABLED = False
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
     'Accept-Encoding': 'gzip, deflate, br',
     'Connection': 'keep-alive',
     'Upgrade-Insecure-Requests': '1',
@@ -39,12 +42,12 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Enable or disable spider middlewares
 SPIDER_MIDDLEWARES = {
-    'milesight_scraper.middlewares.MilesightScraperSpiderMiddleware': 543,
+    'mainsite_scraper.middlewares.GenericPortalSpiderMiddleware': 543,
 }
 
 # Enable or disable downloader middlewares
 DOWNLOADER_MIDDLEWARES = {
-    'milesight_scraper.middlewares.RandomUserAgentMiddleware': 400,
+    'mainsite_scraper.middlewares.RandomUserAgentMiddleware': 400,
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 }
 
@@ -55,7 +58,7 @@ EXTENSIONS = {
 
 # Configure item pipelines
 ITEM_PIPELINES = {
-    'milesight_scraper.pipelines.SaveHtmlPipeline': 300,
+    'mainsite_scraper.pipelines.SaveHtmlPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -73,32 +76,75 @@ RETRY_ENABLED = True
 RETRY_TIMES = 3
 RETRY_HTTP_CODES = [500, 502, 503, 504, 522, 524, 408, 429]
 
-# Depth limit
+# Depth limit (0 = unlimited)
 DEPTH_LIMIT = 0
 
-# Custom settings
-ALLOWED_DOMAINS = ['www.milesight.cn', 'milesight.cn']
+# ============================================================
+# 通用爬虫配置（不再硬编码特定域名）
+# ============================================================
 
 # Output directory for saved HTML files
 OUTPUT_DIR = './output'
 
-# URL patterns to exclude
-EXCLUDE_PATTERNS = [
-    r'/wp-admin/',
-    r'/wp-content/',
-    r'/wp-includes/',
-    r'/feed',
-    r'/attachment/',
-    r'/m/',
-    r'/comment-page-',
-    r'\?replytocom=',
-    r'\?s=',
-    r'/category/[^/]+/page/',
-    r'/tag/[^/]+/page/',
-]
+# History expire days (for incremental crawling)
+HISTORY_EXPIRE_DAYS = 90
 
 # File size limit in bytes (skip very large files like PDFs, videos)
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 
 # Follow links settings
 FOLLOW_LINKS = True
+
+# ============================================================
+# URL 过滤配置
+# ============================================================
+
+# 语言排除模式（路径前缀和子域名）
+LANGUAGE_EXCLUDE_PATTERNS = [
+    # 路径前缀
+    r'^/zh/', r'^/cn/', r'^/de/', r'^/fr/', r'^/ja/', r'^/ko/',
+    r'^/es/', r'^/pt/', r'^/ru/', r'^/ar/', r'^/it/', r'^/nl/',
+    # 子域名
+    r'^https?://zh\.', r'^https?://cn\.', r'^https?://de\.',
+    r'^https?://fr\.', r'^https?://ja\.', r'^https?://ko\.',
+]
+
+# 通用排除模式
+EXCLUDE_PATTERNS = [
+    # WordPress
+    r'/wp-admin/',
+    r'/wp-content/',
+    r'/wp-includes/',
+    r'/feed',
+    r'/attachment/',
+    r'/comment-page-',
+    r'\?replytocom=',
+    # 搜索
+    r'\?s=',
+    # 分页
+    r'/page/\d+',
+    r'/category/[^/]+/page/',
+    r'/tag/[^/]+/page/',
+    # 移动端
+    r'/m/',
+    # 购物车/结账
+    r'/cart',
+    r'/checkout',
+    r'/basket',
+    # 其他
+    r'/print/',
+    r'/pdf/',
+    r'\?print=',
+    r'\?pdf=',
+]
+
+# 排除的文件扩展名
+EXCLUDE_EXTENSIONS = [
+    '.pdf', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico', '.webp', '.bmp',
+    '.css', '.js', '.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm',
+    '.mp3', '.wav', '.ogg', '.flac',
+    '.zip', '.rar', '.7z', '.tar', '.gz',
+    '.exe', '.dmg', '.pkg', '.apk', '.ipa',
+    '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
+    '.json', '.xml', '.rss', '.atom',
+]

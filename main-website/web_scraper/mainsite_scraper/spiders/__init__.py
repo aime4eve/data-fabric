@@ -1,14 +1,9 @@
 """
-本爬虫仅供学习研究使用，请遵守目标网站的robots协议及所有法律法规。不得用于任何商业用途或非法用途。
+本爬虫仅供学习研究使用，请遵守目标网站的robots协议及所有法律法规。
+不得用于任何商业用途或非法用途。
+
+通用企业门户网站爬虫模块
+作者：伍志勇
 """
 
-import scrapy
-
-
-class MilesightScraperSpider(scrapy.Spider):
-    name = 'milesight_scraper'
-    allowed_domains = ['www.milesight.cn']
-    start_urls = ['https://www.milesight.cn/']
-
-    def parse(self, response):
-        pass
+# 这个包可以留空或只包含必要的导入

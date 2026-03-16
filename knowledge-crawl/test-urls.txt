@@ -1,3 +1,2 @@
 # Phase 3 测试 URL 列表
-https://www.gouldvalve.com/industries/agriculture-irrigation
-https://esular.com/products/solenoid-valve-control-unit
+https://www.nanfu.global/

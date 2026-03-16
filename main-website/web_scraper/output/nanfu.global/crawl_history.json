@@ -1,0 +1,13 @@
+{
+  "site": "nanfu.global",
+  "first_crawl": "2026-03-13T11:43:13.412652",
+  "last_crawl": "2026-03-13T14:48:59.236759",
+  "urls": {
+    "https://www.nanfu.global/": {
+      "first_seen": "2026-03-13T11:43:26.918368",
+      "content_hash": "aebc1c899a11c27109ed5e0789b001e25817e59c1503695e89cf1c9c39ad06e5",
+      "local_path": null,
+      "last_modified": null
+    }
+  }
+}
